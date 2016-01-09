@@ -103,7 +103,7 @@ namespace nodeParser
         {
             //if (debug)
             Debug.Log("getmatParser:" + shaderName);
-            foreach(var m in matParsers.Keys)
+            foreach (var m in matParsers.Keys)
             {
                 Debug.Log(m);
             }
@@ -293,6 +293,8 @@ namespace nodeParser
             {
                 var json = nodeParser.GetMatConfig(mat);
                 parser.InitMatParser(mat.shader.name, json);
+
+                #region 自动保存shaderparser配置，这一段可以关闭
                 string path = Application.dataPath + "/resources/shaderparser";
                 if (System.IO.Directory.Exists(path) == false)
                     System.IO.Directory.CreateDirectory(path);
@@ -304,6 +306,7 @@ namespace nodeParser
                     System.IO.File.Delete(file);
 
                 System.IO.File.WriteAllText(file, json.ToString());
+                #endregion
             }
 #endif
             parser.GetMatParser(mat.shader.name).WriteToJson(this, mat, _json);
