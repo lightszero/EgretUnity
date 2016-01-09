@@ -1,3 +1,13 @@
+# Unity Files
+Library
+Temp
+obj
+.vs
+*.sln
+*.csproj
+
+export
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
