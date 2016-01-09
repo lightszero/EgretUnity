@@ -1,5 +1,5 @@
 ﻿EgretUnity
-![image](https://github.com/lightszero/egretunity/raw/master/screenshots/icon.png)
+![image](https://github.com/lightszero/egretunity/raw/master/icon.png)
 
 是为Egret3D开发的Unity组件
 
