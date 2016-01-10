@@ -17,7 +17,7 @@ public class windowEgretUnity : EditorWindow
     #endregion
     #region usevalue
     GameObject setobj = null;//选中的对象
-    bool bUseHashName = true;//是否使用hash作为资源文件名
+    //bool bUseHashName = true;//是否使用hash作为资源文件名
     string exportResult = null;//导出结果
     string exportPath = null;//导出路径
     bool bUseHashTreeName = false;//是否使用hash作为导出节点名

@@ -73,16 +73,16 @@ class SampleScene
         this._cameraCtl.setEyesLength(10);
         //加载场景文件，此处会自动加载所有相关资源到streambox中
         var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/Cube.indexlist.txt", () =>
-        {
-            console.warn("index loaded.");
+            {
+                console.warn("index loaded.");
             
-            //load Scene;
-            //处理模块
-            var parseModel = new FreeNode.ForEgret3D.Parser(this._view3D, this._lightGroup);
-            var sceneParser = new FreeNode.SceneParser(parseModel, streambox);
-            var node = <egret3d.Object3D>sceneParser.ParseScene();
-        }
-            , false);//由于egret3d不支持dataurl，关闭它
+                //load Scene;
+                //处理模块
+                var parseModel = new FreeNode.ForEgret3D.Parser(this._view3D, this._lightGroup);
+                var sceneParser = new FreeNode.SceneParser(parseModel, streambox);
+                var node = <egret3d.Object3D>sceneParser.ParseScene();
+            }
+            , false);//在egret环境，这里用false;
     }
     protected onUpdate(): void
     {
