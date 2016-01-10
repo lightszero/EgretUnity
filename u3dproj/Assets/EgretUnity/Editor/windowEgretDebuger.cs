@@ -37,18 +37,20 @@ class windowEgretDebuger : EditorWindow
     }
     class DebugServer : WebSocketSharp.Server.WebSocketBehavior
     {
+        WebSocketSharp.Server.WebSocketServer server;
         public DebugServer()
         {
-            var wssv = new WebSocketSharp.Server.WebSocketServer("ws://127.0.0.1:8809");
-            wssv.AddWebSocketService<DebugServer>("/Debug",
+            server = new WebSocketSharp.Server.WebSocketServer("ws://127.0.0.1:8809");
+            server.AddWebSocketService<DebugServer>("/Debug",
                 () =>
                 {
                     return this;
                 });
+            server.Start();
         }
         public void Close()
         {
-            this.Close();
+            server.Stop();
         }
         protected override void OnMessage(MessageEventArgs e)
         {
