@@ -7,6 +7,7 @@ obj
 *.csproj
 
 export
+bin-debug
 
 # Windows image file caches
 Thumbs.db
