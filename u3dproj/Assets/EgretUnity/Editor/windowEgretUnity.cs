@@ -6,9 +6,9 @@ using System;
 public class windowEgretUnity : EditorWindow
 {
 
-    const string version = "v0.02";
+    public const string version = "v0.02";
     #region windowinit
-    [MenuItem("EgretUnity/ShowWindow")]
+    [MenuItem("EgretUnity/ShowResExportWindow")]
     static void ShowWindow()
     {
         var window = EditorWindow.GetWindow<windowEgretUnity>(true, "EgretUnity " + version);

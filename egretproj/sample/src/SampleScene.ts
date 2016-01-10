@@ -83,6 +83,8 @@ class SampleScene
                 var node = <egret3d.Object3D>sceneParser.ParseScene();
             }
             , false);//在egret环境，这里用false;
+
+        egretUnity.InitDebuger();
     }
     protected onUpdate(): void
     {
