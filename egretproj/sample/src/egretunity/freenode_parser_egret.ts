@@ -248,9 +248,9 @@ namespace FreeNode.ForEgret3D
             var matjson = JSON.parse(box.cacheTxt[matstr]);
             //var mat = new BABYLON.StandardMaterial("texture1", parent.getScene());
 
-            if (matjson["mainColor"] != undefined)
+            if (matjson["_Color"] != undefined)
             {
-                var sp = (<string>matjson["mainColor"]).split(",");
+                var sp = (<string>matjson["_Color"]).split(",");
                 var r = parseInt(sp[0]) / 255.0;
                 var g = parseInt(sp[1]) / 255.0;
                 var b = parseInt(sp[2]) / 255.0;
@@ -260,12 +260,21 @@ namespace FreeNode.ForEgret3D
                 //    mat.diffuseColor = new BABYLON.Color3(r, g, b);
                 //    mat.alpha = a;
             }
-            if (matjson["mainTexture"] != undefined)
+            if (matjson["_MainTex"] != undefined)
             {
-                var tex = matjson["mainTexture"];
+                var tex = matjson["_MainTex"];
                 var texurl = box.cachePic[tex];
                 console.log("texurl=" + texurl);
-                    
+                
+                var textureLoad: egret3d.TextureLoader = new egret3d.TextureLoader(texurl);
+                textureLoad.addEventListener(egret3d.Event3D.EVENT_LOAD_COMPLETE,
+                    (e: egret3d.Event3D) =>
+                    {
+                        node.material.diffuseTexture = textureLoad.texture;
+                    }
+                );
+                textureLoad.load();
+
                 //var tloadr = new egret3d.TextureLoader(texurl);
                 
                 //    //

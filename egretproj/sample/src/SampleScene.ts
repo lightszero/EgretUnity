@@ -16,11 +16,7 @@ class SampleScene
         //创建View3D对象;
         this._view3D = new egret3d.View3D(_viewPort);
 
-        //创建像机控制器;
-        this._cameraCtl = new egret3d.LookAtController(this._view3D.camera3D, new egret3d.Object3D());
 
-        //设置像机视野距离;
-        this._cameraCtl.setEyesLength(0.1);
 
         //设置天空盒
         var skyTexture: egret3d.SkyTexture = new egret3d.SkyTexture(
@@ -37,15 +33,12 @@ class SampleScene
 
         this._lightGroup = new egret3d.LightGroup();
 
-        var directLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(100,100,100));
+        var directLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(100, 100, 100));
 
         directLight.diffuse = 0x555555;
         directLight.ambient = 0x111111;
         directLight.specular = 0xffffff;
         this._lightGroup.addDirectLight(directLight);
-
-        this._cameraCtl.setEyesLength(10);
-        this._cameraCtl.lookAtPosition = new egret3d.Vector3D(0, 0, 0);
 
         this.onInit();
 
@@ -73,20 +66,11 @@ class SampleScene
     //on才是行为函数
     private onInit(): void
     {
+        //创建像机控制器;
+        this._cameraCtl = new egret3d.LookAtController(this._view3D.camera3D, new egret3d.Object3D());
 
-
-
-        var box = new egret3d.Mesh(new egret3d.CubeGeometry(), new egret3d.TextureMaterial());
-        this._view3D.addChild3D(box);
-        box.scale = new egret3d.Vector3D(0.02, 0.02, 0.02);
-        box.material = new egret3d.TextureMaterial();
-        box.material.lightGroup = this._lightGroup;
-        box.material.specularColor = 0xffffff;
-        box.material.specularPower = 0.5;
-        box.material.ambientColor = 0x00235c;
-
-        box.material.shininess = 10.0;
-
+        //设置像机视野距离;
+        this._cameraCtl.setEyesLength(10);
         //加载场景文件，此处会自动加载所有相关资源到streambox中
         var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/Cube.indexlist.txt", () =>
         {
@@ -97,14 +81,8 @@ class SampleScene
             var parseModel = new FreeNode.ForEgret3D.Parser(this._view3D, this._lightGroup);
             var sceneParser = new FreeNode.SceneParser(parseModel, streambox);
             var node = <egret3d.Object3D>sceneParser.ParseScene();
-            //this.node = <BABYLON.Mesh>p.ParseScene();
-            //this.node.scaling.x = 0.05;
-            //this.node.scaling.y = 0.05;
-            //this.node.scaling.z = 0.05;
-            //this.node.position = new BABYLON.Vector3(0, 0, 0);
-            //this.camera.position = new BABYLON.Vector3(this.node.position.x + 0, this.node.position.y + 50, this.node.position.z - 50);
-            //this.camera.setTarget(this.node.position);
-        });
+        }
+            , false);//由于egret3d不支持dataurl，关闭它
     }
     protected onUpdate(): void
     {

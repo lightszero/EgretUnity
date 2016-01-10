@@ -6,7 +6,7 @@ namespace FreeNode
 {
     export interface IParser
     {
-        ParseNode(parser: SceneParser,json: {}, parent: any): any;//处理节点
+        ParseNode(parser: SceneParser, json: {}, parent: any): any;//处理节点
 
         ParseComponent(parser: SceneParser, json: {}, box: FreeNode.StreamBox, parent: any): any;//处理组件
     }
@@ -38,6 +38,9 @@ namespace FreeNode
         public initState: StreamBoxState = StreamBoxState.NotInit;
         taskCount: number = 0;
         taskFinish: number = 0;
+
+        public picPreDownload: boolean = true;
+        public picUseDataUrl: boolean = true;
         public loadTxt(baseurl: string, name: string)
         {
             var rname = name;
@@ -92,11 +95,17 @@ namespace FreeNode
             this.taskCount++;
 
             var cacheurl: string = baseurl + "/" + name;
+            if (this.picPreDownload == false)
+            {
+                this.cachePic[rname] = cacheurl;
+                this.taskFinish++;
+                return;
+            }
             loadTool.loadBlob(cacheurl, (_blob, _err) =>
             {
                 if (_err == null)
                 {
-                    if (_blob.size < 65535)
+                    if (_blob.size < 65535 && this.picUseDataUrl == true)
                     {//do a dataurl
 
                         var fr: FileReader = (new FileReader());
@@ -131,13 +140,16 @@ namespace FreeNode
         }
         public onLoadFinish: () => void;
 
-
-        static CreateFromIndexFile(url: string, func: () => void): StreamBox
+        ///picpredown，是否下载一次图片
+        ///picusedataurl，自动下载图片后，是否将小图片（低于64k）的转换为dataurl
+        ///因为egret3d不支持dataurl，所以增加两个开关控制
+        static CreateFromIndexFile(url: string, func: () => void, picPredown: boolean = true, picUseDataurl: boolean = true): StreamBox
         {
             var i = url.lastIndexOf("/");
             var baseurl = url.substring(0, i);
 
             var box = new StreamBox(baseurl);
+            box.picPreDownload = picPredown;
             console.log("StreamBox CreateByIndex:" + url);
             loadTool.loadText(url, (_t, _e) =>
             {
@@ -510,7 +522,7 @@ namespace FreeNode
         private _parseNode(json: {}, pnode: any): any
         {
             var name = <string>json["name"];
-            var node = this.parser.ParseNode(this,json, pnode);
+            var node = this.parser.ParseNode(this, json, pnode);
             //console.log("pnode:" + name);
             
             var components = <[]>json["components"];
@@ -519,7 +531,7 @@ namespace FreeNode
                 {
                     var type = components[i]["type"];
                     //console.log("pcom:" + type);
-                    this.parser.ParseComponent(this,components[i], this.box, node);
+                    this.parser.ParseComponent(this, components[i], this.box, node);
                 }
             var children = <[]>json["children"];
             if (children != undefined)

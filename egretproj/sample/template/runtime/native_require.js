@@ -8,6 +8,7 @@ var game_file_list = [
 	"bin-debug/Main.js",
 	"bin-debug/egretunity/freenode.js",
 	"bin-debug/egretunity/freenode_parser_egret.js",
+	"bin-debug/egretunity/egretunity.js",
 	"bin-debug/SampleScene.js",
 	//----auto game_file_list end----
 ];
