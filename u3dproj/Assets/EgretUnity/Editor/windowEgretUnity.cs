@@ -47,7 +47,7 @@ public class windowEgretUnity : EditorWindow
         }
         GUILayout.Space(12);
         GUILayout.Label("选择名字参数，建议hash做名字");
-        bUseHashName = EditorGUILayout.Toggle("是否使用hash做名字", bUseHashName);
+        //bUseHashName = EditorGUILayout.Toggle("是否使用hash做名字", bUseHashName);
         bUseHashTreeName = EditorGUILayout.Toggle("是否使用hash做导出节点的名字", bUseHashTreeName);
         if (bUseHashTreeName == false)
         {
@@ -92,23 +92,34 @@ public class windowEgretUnity : EditorWindow
         if (System.IO.Directory.Exists(respath) == false)
             System.IO.Directory.CreateDirectory(respath);
 
+        MyJson.JsonNode_Array indexfile = new MyJson.JsonNode_Array();
         foreach (var f in np.bufs)
         {
-            if (f.Key.Contains(".jsontree.txt"))//节点文件
-            {
-                string outfile = null;
-                if (bUseHashTreeName)//用hash名字
-                    outfile = System.IO.Path.Combine(exportPath, f.Key);
-                else//or自定义名字
-                    outfile = System.IO.Path.Combine(exportPath, exportNodeName + ".jsontree.txt");
-                System.IO.File.WriteAllBytes(outfile, f.Value);
-            }
-            else
+            //写入文件
             {
                 var file = System.IO.Path.Combine(respath, f.Key);
                 System.IO.File.WriteAllBytes(file, f.Value);
             }
+            //记录索引
+            MyJson.JsonNode_Object indexitem = new MyJson.JsonNode_Object();
+            indexitem["Name"] = new MyJson.JsonNode_ValueString("resources/" + f.Key);
+            indexitem["Length"] = new MyJson.JsonNode_ValueNumber(f.Value.Length);
+            indexfile.Add(indexitem);
         }
+        indexfile.Sort((a, b) =>
+        {
+            return string.Compare(a.asDict()["Name"].AsString(), b.asDict()["Name"].AsString());
+        });
+        {//保存索引文件
+            byte[] indexcode = System.Text.Encoding.UTF8.GetBytes(indexfile.ToString());
+            string outfile = System.IO.Path.Combine(exportPath, exportNodeName + ".indexlist.txt");
+            if (bUseHashTreeName)
+            {
+                outfile = System.IO.Path.Combine(exportPath, ResLibTool.ComputeHashString(indexcode) + ".indexlist.txt");
+            }
+            System.IO.File.WriteAllBytes(outfile, indexcode);
+        }
+
     }
 
     void Update()

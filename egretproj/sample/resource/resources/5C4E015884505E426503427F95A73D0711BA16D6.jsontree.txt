@@ -1,0 +1,20 @@
+{
+    "name":"Cube",
+    "components":[
+        {
+            "type":"boxcollider",
+            "center":"0,0,0",
+            "size":"1,1,1"
+            },
+        {
+            "type":"meshrenderer",
+            "mats":[
+                "2177BA27BF0973D4CC3EC21E8F8C2A07FD15CAA2.jsonmat.txt"
+                ]
+            },
+        {
+            "type":"meshfilter",
+            "mesh":"C52CE6AE1CFFC08ADAAFD795D149DD4E8C251EDF.mesh.bin"
+            }
+        ]
+    }

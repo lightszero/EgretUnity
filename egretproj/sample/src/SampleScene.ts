@@ -7,7 +7,9 @@ class SampleScene
     protected _timeDate: Date = null;
     protected _view3D: egret3d.View3D = null;
     protected _cameraCtl: egret3d.LookAtController = null;
-
+    _lightGroup: egret3d.LightGroup = null;
+   
+    //初始化
     public Init(_viewPort: egret3d.Rectangle): void
     {
 
@@ -33,45 +35,70 @@ class SampleScene
         this._view3D.sky = new egret3d.Sky(skyTexture);
 
 
-        this._time = new Date().getTime();
-
-        this.initScene();
-
-        requestAnimationFrame(() => this.onUpdate());
-    }
-    private initScene(): void
-    {
-        var box = new egret3d.Mesh(new egret3d.CubeGeometry(), new egret3d.TextureMaterial());
-
-        var lightGroup: egret3d.LightGroup = new egret3d.LightGroup();
+        this._lightGroup = new egret3d.LightGroup();
 
         var directLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(100, 100, 100));
 
         directLight.diffuse = 0xffffff;
 
-        lightGroup.addDirectLight(directLight);
-
-        box.material.lightGroup = lightGroup;
-
-        this._view3D.addChild3D(box);
-
+        this._lightGroup.addDirectLight(directLight);
 
         this._cameraCtl.setEyesLength(1000);
+
+
+        this.onInit();
+
+        this._time = new Date().getTime();
+        requestAnimationFrame(() => this._Update());
     }
-
-    protected onUpdate(): void
+    private _Update(): void
     {
-
         this._timeDate = new Date();
 
         this._delay = this._timeDate.getTime() - this._time;
 
         this._time = this._timeDate.getTime();
 
-        this._cameraCtl.update();
+
+
+        this.onUpdate();
 
         this._view3D.renden(this._time, this._delay);
 
-        requestAnimationFrame(() => this.onUpdate());
+        requestAnimationFrame(() => this._Update());
+    }
+
+
+    //on才是行为函数
+    private onInit(): void
+    {
+
+
+
+        var box = new egret3d.Mesh(new egret3d.CubeGeometry(), new egret3d.TextureMaterial());
+        box.material.lightGroup = this._lightGroup;
+        this._view3D.addChild3D(box);
+
+        //加载场景文件，此处会自动加载所有相关资源到streambox中
+        var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/Cube.indexlist.txt", () =>
+        {
+            console.warn("index loaded.");
+            //load Scene;
+            //var parseMode = new FreeNode.ForBabylon.Parser(this.scene);
+            //var p = new FreeNode.SceneParser(parseMode, box);
+            //this.node = <BABYLON.Mesh>p.ParseScene();
+            //this.node.scaling.x = 0.05;
+            //this.node.scaling.y = 0.05;
+            //this.node.scaling.z = 0.05;
+            //this.node.position = new BABYLON.Vector3(0, 0, 0);
+            //this.camera.position = new BABYLON.Vector3(this.node.position.x + 0, this.node.position.y + 50, this.node.position.z - 50);
+            //this.camera.setTarget(this.node.position);
+        });
+    }
+    protected onUpdate(): void
+    {
+
+        this._cameraCtl.update();
+
     }
 }

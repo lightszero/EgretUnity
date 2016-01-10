@@ -1,0 +1,14 @@
+{
+    "shaderName":"Standard",
+    "_Color":"255,255,255,255",
+    "_MainTex":"4726D31C6049CA18F76A3985959B363976099EB9.png",
+    "_Cutoff":0.5,
+    "_Glossiness":0.5,
+    "_Metallic":0,
+    "_BumpScale":1,
+    "_Parallax":0.0199999995529652,
+    "_OcclusionStrength":1,
+    "_EmissionColor":"0,0,0,255",
+    "_DetailNormalMapScale":1,
+    "_UVSec":0
+    }
