@@ -6,7 +6,7 @@ using System;
 public class windowEgretUnity : EditorWindow
 {
 
-    const string version = "v0.01";
+    const string version = "v0.02";
     #region windowinit
     [MenuItem("EgretUnity/ShowWindow")]
     static void ShowWindow()
