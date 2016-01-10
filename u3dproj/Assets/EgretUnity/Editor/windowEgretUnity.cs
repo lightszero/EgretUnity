@@ -112,11 +112,14 @@ public class windowEgretUnity : EditorWindow
         });
         {//保存索引文件
             byte[] indexcode = System.Text.Encoding.UTF8.GetBytes(indexfile.ToString());
-            string outfile = System.IO.Path.Combine(exportPath, exportNodeName + ".indexlist.txt");
+
+            exportResult = exportNodeName;
             if (bUseHashTreeName)
             {
-                outfile = System.IO.Path.Combine(exportPath, ResLibTool.ComputeHashString(indexcode) + ".indexlist.txt");
+                exportResult = ResLibTool.ComputeHashString(indexcode);
             }
+            string outfile = System.IO.Path.Combine(exportPath, exportResult + ".indexlist.txt");
+
             System.IO.File.WriteAllBytes(outfile, indexcode);
         }
 

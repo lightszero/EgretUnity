@@ -40,13 +40,17 @@ namespace FreeNode
         taskFinish: number = 0;
         public loadTxt(baseurl: string, name: string)
         {
-            this.cacheTxt[name] = null;
+            var rname = name;
+            var i: number = rname.lastIndexOf("/");
+            if (i >= 0)
+                rname = rname.substring(i + 1);
+            this.cacheTxt[rname] = null;
             this.taskCount++;
             loadTool.loadText(baseurl + "/" + name, (_txt, _err) =>
             {
                 if (_err == null)
                 {
-                    this.cacheTxt[name] = _txt;
+                    this.cacheTxt[rname] = _txt;
                     this.taskFinish++;
                     console.log("task(" + this.taskFinish + "/" + this.taskCount + " got txt=" + name + " len=" + _txt.length);
                     if (this.taskCount == this.taskFinish && this.initState == StreamBoxState.Inited) this.onLoadFinish();
@@ -56,14 +60,18 @@ namespace FreeNode
         }
         public loadBin(baseurl: string, name: string)
         {
-            this.cacheBin[name] = null;
+            var rname = name;
+            var i: number = rname.lastIndexOf("/");
+            if (i >= 0)
+                rname = rname.substring(i + 1);
+            this.cacheBin[rname] = null;
             this.taskCount++;
             loadTool.loadArrayBuffer(baseurl + "/" + name, (_bin, _err) =>
             {
                 if (_err == null)
                 {
                     //ParseTool.loadMesh(_bin);
-                    this.cacheBin[name] = _bin;
+                    this.cacheBin[rname] = _bin;
                     this.taskFinish++;
 
                     console.log("task(" + this.taskFinish + "/" + this.taskCount + " got bin=" + name + " len=" + _bin.byteLength);
@@ -75,7 +83,12 @@ namespace FreeNode
         }
         public loadPic(baseurl: string, name: string)
         {
-            this.cachePic[name] = null;
+            var rname = name;
+            var i: number = rname.lastIndexOf("/");
+            if (i >= 0)
+                rname = rname.substring(i + 1);
+
+            this.cachePic[rname] = null;
             this.taskCount++;
 
             var cacheurl: string = baseurl + "/" + name;
@@ -89,7 +102,7 @@ namespace FreeNode
                         var fr: FileReader = (new FileReader());
                         fr.onload = (e) =>
                         {
-                            this.cachePic[name] = fr.result;
+                            this.cachePic[rname] = fr.result;
                             this.taskFinish++;
 
                             console.log("task(" + this.taskFinish + "/" + this.taskCount + " got pic=" + this.cachePic[name]);
@@ -102,7 +115,7 @@ namespace FreeNode
                     }
                     else
                     {//just do a cache
-                        this.cachePic[name] = cacheurl;
+                        this.cachePic[rname] = cacheurl;
 
                     }
                     this.taskFinish++;
@@ -287,15 +300,15 @@ namespace FreeNode
         name: string;
 
         vec3positions: Float32Array;
-        vec3normals: Float32Array;
-        vec4tangents: Float32Array;
-        vec2uvs0: Float32Array
-        vec2uvs1: Float32Array;
-        vec2uvs2: Float32Array;
+        vec3normals: Float32Array = null;
+        vec4tangents: Float32Array = null;
+        vec2uvs0: Float32Array = null;
+        vec2uvs1: Float32Array = null;
+        vec2uvs2: Float32Array = null;
         //vec2uvs4: Float32Array;
         //uvs5: number[];
         //     uvs6: number[];
-        vec4colors: Float32Array;
+        vec4colors: Float32Array = null;
         //matricesIndices: number[];
         //matricesWeights: number[];
         indices: SubMesh[];
@@ -376,7 +389,7 @@ namespace FreeNode
 
                     }
                 }
-                if (tag == 7)
+                if (tag == 7)//tangent
                 {
                     meshdata.vec4tangents = new Float32Array(vcount * 4);
                     for (var i = 0; i < vcount; i++)

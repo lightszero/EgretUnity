@@ -216,7 +216,7 @@ namespace nodeParser
                 _cjson["type"] = new MyJson.JsonNode_ValueString(type);
                 if (componentParsers.ContainsKey(type) == false)
                 {
-
+                    Debug.LogWarning("can't find comparser:" + type);
                     continue;
                 }
 

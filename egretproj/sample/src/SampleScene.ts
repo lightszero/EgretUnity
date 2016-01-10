@@ -37,14 +37,15 @@ class SampleScene
 
         this._lightGroup = new egret3d.LightGroup();
 
-        var directLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(100, 100, 100));
+        var directLight: egret3d.DirectLight = new egret3d.DirectLight(new egret3d.Vector3D(100,100,100));
 
-        directLight.diffuse = 0xffffff;
-
+        directLight.diffuse = 0x555555;
+        directLight.ambient = 0x111111;
+        directLight.specular = 0xffffff;
         this._lightGroup.addDirectLight(directLight);
 
-        this._cameraCtl.setEyesLength(1000);
-
+        this._cameraCtl.setEyesLength(10);
+        this._cameraCtl.lookAtPosition = new egret3d.Vector3D(0, 0, 0);
 
         this.onInit();
 
@@ -76,16 +77,26 @@ class SampleScene
 
 
         var box = new egret3d.Mesh(new egret3d.CubeGeometry(), new egret3d.TextureMaterial());
-        box.material.lightGroup = this._lightGroup;
         this._view3D.addChild3D(box);
+        box.scale = new egret3d.Vector3D(0.02, 0.02, 0.02);
+        box.material = new egret3d.TextureMaterial();
+        box.material.lightGroup = this._lightGroup;
+        box.material.specularColor = 0xffffff;
+        box.material.specularPower = 0.5;
+        box.material.ambientColor = 0x00235c;
+
+        box.material.shininess = 10.0;
 
         //加载场景文件，此处会自动加载所有相关资源到streambox中
         var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/Cube.indexlist.txt", () =>
         {
             console.warn("index loaded.");
+            
             //load Scene;
-            //var parseMode = new FreeNode.ForBabylon.Parser(this.scene);
-            //var p = new FreeNode.SceneParser(parseMode, box);
+            //处理模块
+            var parseModel = new FreeNode.ForEgret3D.Parser(this._view3D, this._lightGroup);
+            var sceneParser = new FreeNode.SceneParser(parseModel, streambox);
+            var node = <egret3d.Object3D>sceneParser.ParseScene();
             //this.node = <BABYLON.Mesh>p.ParseScene();
             //this.node.scaling.x = 0.05;
             //this.node.scaling.y = 0.05;
