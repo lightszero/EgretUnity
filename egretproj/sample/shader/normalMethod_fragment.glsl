@@ -17,7 +17,7 @@ void main() {
     TBN[1] = normalize( cross(TBN[0],TBN[2]) ); 
 	normal = 0.5 * normalize(varying_eyeNormal.xyz) + vec3( 0.5 , 0.5 , 0.5 ) ;
 	 
-	gl_FragColor =  vec4( normal , 1.0 ); 
+	diffuse =  vec4( varying_pos.xyz , 1.0 ); 
 }
 
 

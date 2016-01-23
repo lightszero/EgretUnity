@@ -1,4 +1,4 @@
-﻿attribute highp vec3 attribute_position ;
+attribute highp vec3 attribute_position ;
 attribute vec3 attribute_normal ;
 attribute vec3 attribute_tangent ;
 attribute vec4 attribute_color ;

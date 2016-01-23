@@ -25,38 +25,24 @@
 	<script egret="lib" src="libs/modules/egret/egret.js" src-release="libs/modules/egret/egret.min.js"></script>
 	<script egret="lib" src="libs/modules/egret/egret.web.js" src-release="libs/modules/egret/egret.web.min.js"></script>
 	<!--modules_files_end-->
-
+	
     <!--这个标签为不通过egret提供的第三方库的方式使用的 javascript 文件，请将这些文件放在libs下，但不要放在modules下面。-->
     <!--other_libs_files_start-->
+	<script egret="lib" src="libs/egret3d.js" src-release="libs/egret3d.js"></script>
     <!--other_libs_files_end-->
-    <script egret="game" src="egret3d.js"></script>  
+
     <!--这个标签会被替换为项目中所有的 javascript 文件。删除 game_files 标签后，项目文件加载列表将不会变化，请谨慎操作！-->
     <!--game_files_start-->
-	<script egret="game" src="bin-debug/Main.js"></script>
+	<script egret="game" src="bin-debug/egretunity/egretunity.js"></script>
 	<script egret="game" src="bin-debug/egretunity/freenode.js"></script>
 	<script egret="game" src="bin-debug/egretunity/freenode_parser_egret.js"></script>
-	<script egret="game" src="bin-debug/egretunity/egretunity.js"></script>
+	<script egret="game" src="bin-debug/Main.js"></script>
 	<script egret="game" src="bin-debug/SampleScene.js"></script>
 	<!--game_files_end-->
-
-
-    <img id="t1" src="resource/sky/cloudy_noon_FR.png" hidden="hidden" />
-    <img id="t2" src="resource/sky/cloudy_noon_BK.png" hidden="hidden" />
-    <img id="t3" src="resource/sky/cloudy_noon_LF.png" hidden="hidden" />
-    <img id="t4" src="resource/sky/cloudy_noon_RT.png" hidden="hidden" />
-    <img id="t5" src="resource/sky/cloudy_noon_UP.png" hidden="hidden" />
-    <img id="t6" src="resource/sky/cloudy_noon_DN.png" hidden="hidden" />
-
-    <img id="t1_1" src="resource/sky/Mars_skybox_front.jpg" hidden="hidden" />
-    <img id="t1_2" src="resource/sky/Mars_skybox_back.jpg" hidden="hidden" />
-    <img id="t1_3" src="resource/sky/Mars_skybox_left.jpg" hidden="hidden" />
-    <img id="t1_4" src="resource/sky/Mars_skybox_right.jpg" hidden="hidden" />
-    <img id="t1_5" src="resource/sky/Mars_skybox_up.jpg" hidden="hidden" />
-    <img id="t1_6" src="resource/sky/Mars_skybox_down.jpg" hidden="hidden" />
 </head>
 <body>
 
-    <div style="margin: auto;width: 0%;height: 0%;" class="egret-player"
+    <div style="margin: auto;width: 0%;height: 0%;" class="egret-player" 
          data-entry-class="Main"
          data-orientation="auto"
          data-scale-mode="noScale"
