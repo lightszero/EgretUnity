@@ -67,14 +67,14 @@ namespace FreeNode.ForEgret3D
             {
                 var pobj = <egret3d.Object3D>parent;
                 pobj.addChild(n);
+
             }
             else
             {
-                this.view.addChild3D(n);
+                this.view.root.addChild(n);
             }
             return n;
         }
-
         ParseComponent(parser: FreeNode.SceneParser, json: {}, box: FreeNode.StreamBox, parent: any): any//处理组件
         {
             if (json["type"] == "transform")
@@ -110,7 +110,7 @@ namespace FreeNode.ForEgret3D
             var w = parseFloat(sp2[3]);// * -1;
             var quat = new egret3d.Quaternion(x, y, z, w);
             var ruler3 = quat.toEulerAngles();
-            node.rotation = ruler3;
+            node.orientation = quat;
 
             console.log("name=" + node.name + "vec3=" + vec3.toString() + " scale3=" + scale3.toString() + " ruler3=" + ruler3.toString());
 
@@ -133,9 +133,10 @@ namespace FreeNode.ForEgret3D
                 var y = _data.vec3positions[i * 3 + 1];
                 var z = _data.vec3positions[i * 3 + 2];
 
-                geom.verticesData.push(x);
-                geom.verticesData.push(y);
-                geom.verticesData.push(z);
+                //egret3d 计算系统有坑，先乘以2
+                geom.verticesData.push(x*2);
+                geom.verticesData.push(y*2);
+                geom.verticesData.push(z*2);
                 if (_data.vec3normals != null)
                 {
                     var nx = _data.vec3normals[i * 3 + 0];
@@ -232,7 +233,6 @@ namespace FreeNode.ForEgret3D
 
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
         }
-
         _parseMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
             console.log("set mat");
