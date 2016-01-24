@@ -89,6 +89,10 @@ namespace FreeNode.ForEgret3D
             {
                 this._parseMeshRenderer(json, box, parent);
             }
+            if (json["type"] == "skinnedmeshrenderer")
+            {
+                this._parseSkinnedMeshRenderer(json, box, parent);
+            }
             console.log("parse com:" + json["type"]);
         }
         _parseTransform(json: {}, box: FreeNode.StreamBox, node: Entity)
@@ -127,104 +131,11 @@ namespace FreeNode.ForEgret3D
             //    new BABYLON.VertexData();
             geom.verticesData = [];
             //bdata.positions = [];//填充位置数据
-            for (var i = 0; i < _data.vec3positions.length / 3; i++)
-            {
-                var x = _data.vec3positions[i * 3 + 0];
-                var y = _data.vec3positions[i * 3 + 1];
-                var z = _data.vec3positions[i * 3 + 2];
-
-                //egret3d 计算系统有坑，先乘以2
-                geom.verticesData.push(x*2);
-                geom.verticesData.push(y*2);
-                geom.verticesData.push(z*2);
-                if (_data.vec3normals != null)
-                {
-                    var nx = _data.vec3normals[i * 3 + 0];
-                    var ny = _data.vec3normals[i * 3 + 1];
-                    var nz = _data.vec3normals[i * 3 + 2];
-                    geom.verticesData.push(nx);//normal
-                    geom.verticesData.push(ny);
-                    geom.verticesData.push(nz);
-                }
-                else
-                {
-                    geom.verticesData.push(0);//normal
-                    geom.verticesData.push(0);
-                    geom.verticesData.push(0);
-                }
-                if (_data.vec4tangents != null)
-                {
-                    var nx = _data.vec4tangents[i * 4 + 0];
-                    var ny = _data.vec4tangents[i * 4 + 1];
-                    var nz = _data.vec4tangents[i * 4 + 2];
-                    geom.verticesData.push(nx);//tangent
-                    geom.verticesData.push(ny);
-                    geom.verticesData.push(nz);
-                }
-                else
-                {
-                    geom.verticesData.push(0);//tangent
-                    geom.verticesData.push(0);
-                    geom.verticesData.push(0);
-                }
-                if (_data.vec4colors != null)
-                {
-                    var r = _data.vec4colors[i * 4 + 0];
-                    var g = _data.vec4colors[i * 4 + 1];
-                    var b = _data.vec4colors[i * 4 + 2];
-                    var a = _data.vec4colors[i * 4 + 3];
-                    geom.verticesData.push(r);//color
-                    geom.verticesData.push(g);
-                    geom.verticesData.push(b);
-                    geom.verticesData.push(a);
-                }
-                else
-                {
-                    geom.verticesData.push(1);//color
-                    geom.verticesData.push(1);
-                    geom.verticesData.push(1);
-                    geom.verticesData.push(1);
-                }
-                if (_data.vec2uvs0 != null)
-                {
-                    var uvx = _data.vec2uvs0[i * 2 + 0];
-                    var uvy = _data.vec2uvs0[i * 2 + 1];
-                    geom.verticesData.push(uvx);//uv0
-                    geom.verticesData.push(uvy);
-                }
-                else
-                {
-                    geom.verticesData.push(0);//uv0
-                    geom.verticesData.push(0);
-                }
-                if (_data.vec2uvs1 != null)
-                {
-                    var uvx = _data.vec2uvs1[i * 2 + 0];
-                    var uvy = _data.vec2uvs1[i * 2 + 1];
-                    geom.verticesData.push(uvx);//uv1
-                    geom.verticesData.push(uvy);
-                }
-                else
-                {
-                    geom.verticesData.push(0);//uv1
-                    geom.verticesData.push(0);
-                }
-            }
-
+            this.__FillGeomVertex(geom.verticesData, _data, false);
 
             //bdata.indices = [];//填充索引数据
             geom.indexData = [];
-            for (var i = 0; i < _data.indices[0].indices.length / 3; i++)
-            {
-                var v0 = _data.indices[0].indices[i * 3 + 0];
-                var v1 = _data.indices[0].indices[i * 3 + 1];
-                var v2 = _data.indices[0].indices[i * 3 + 2];
-
-                //翻转裁剪信息
-                geom.indexData.push(v0);
-                geom.indexData.push(v2);
-                geom.indexData.push(v1);
-            }
+            this.__FillGeomIndex(geom.indexData,_data);
 
             geom.numItems = geom.indexData.length;
 
@@ -233,9 +144,123 @@ namespace FreeNode.ForEgret3D
 
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
         }
+        __FillGeomVertex(verticesData: number[], _data: MeshData, withskin: boolean): void
+        {
+            for (var i = 0; i < _data.vec3positions.length / 3; i++)
+            {
+                var x = _data.vec3positions[i * 3 + 0];
+                var y = _data.vec3positions[i * 3 + 1];
+                var z = _data.vec3positions[i * 3 + 2];
+
+                //egret3d 计算系统有坑，先乘以2
+                verticesData.push(x * 2);
+                verticesData.push(y * 2);
+                verticesData.push(z * 2);
+                if (_data.vec3normals != null)
+                {
+                    var nx = _data.vec3normals[i * 3 + 0];
+                    var ny = _data.vec3normals[i * 3 + 1];
+                    var nz = _data.vec3normals[i * 3 + 2];
+                    verticesData.push(nx);//normal
+                    verticesData.push(ny);
+                    verticesData.push(nz);
+                }
+                else
+                {
+                    verticesData.push(0);//normal
+                    verticesData.push(0);
+                    verticesData.push(0);
+                }
+                if (_data.vec4tangents != null)
+                {
+                    var nx = _data.vec4tangents[i * 4 + 0];
+                    var ny = _data.vec4tangents[i * 4 + 1];
+                    var nz = _data.vec4tangents[i * 4 + 2];
+                    verticesData.push(nx);//tangent
+                    verticesData.push(ny);
+                    verticesData.push(nz);
+                }
+                else
+                {
+                    verticesData.push(0);//tangent
+                    verticesData.push(0);
+                    verticesData.push(0);
+                }
+                if (_data.vec4colors != null)
+                {
+                    var r = _data.vec4colors[i * 4 + 0];
+                    var g = _data.vec4colors[i * 4 + 1];
+                    var b = _data.vec4colors[i * 4 + 2];
+                    var a = _data.vec4colors[i * 4 + 3];
+                    verticesData.push(r);//color
+                    verticesData.push(g);
+                    verticesData.push(b);
+                    verticesData.push(a);
+                }
+                else
+                {
+                    verticesData.push(1);//color
+                    verticesData.push(1);
+                    verticesData.push(1);
+                    verticesData.push(1);
+                }
+                if (_data.vec2uvs0 != null)
+                {
+                    var uvx = _data.vec2uvs0[i * 2 + 0];
+                    var uvy = _data.vec2uvs0[i * 2 + 1];
+                    verticesData.push(uvx);//uv0
+                    verticesData.push(uvy);
+                }
+                else
+                {
+                    verticesData.push(0);//uv0
+                    verticesData.push(0);
+                }
+                if (_data.vec2uvs1 != null)
+                {
+                    var uvx = _data.vec2uvs1[i * 2 + 0];
+                    var uvy = _data.vec2uvs1[i * 2 + 1];
+                    verticesData.push(uvx);//uv1
+                    verticesData.push(uvy);
+                }
+                else
+                {
+                    verticesData.push(0);//uv1
+                    verticesData.push(0);
+                }
+                if (withskin == true)
+                {
+                    verticesData.push(0);//index0;
+                    verticesData.push(0);//index1
+                    verticesData.push(0);//index2
+                    verticesData.push(0);//index3
+                    verticesData.push(0);//widget0;
+                    verticesData.push(0);//widget1
+                    verticesData.push(0);//widget2
+                    verticesData.push(0);//widget3
+                }
+            }
+
+        }
+
+        __FillGeomIndex(indexData: number[], _data: MeshData): void
+        {
+            for (var i = 0; i < _data.indices[0].indices.length / 3; i++)
+            {
+                var v0 = _data.indices[0].indices[i * 3 + 0];
+                var v1 = _data.indices[0].indices[i * 3 + 1];
+                var v2 = _data.indices[0].indices[i * 3 + 2];
+
+                //翻转裁剪信息
+                indexData.push(v0);
+                indexData.push(v2);
+                indexData.push(v1);
+            }
+
+        }
         _parseMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
-            console.log("set mat");
+            console.log("set _parseMeshRenderer");
             node.material = new egret3d.TextureMaterial();
             node.material.lightGroup = this.lightGroup;
             node.material.specularColor = 0xffffff;
@@ -266,6 +291,82 @@ namespace FreeNode.ForEgret3D
                 var texurl = box.cachePic[tex];
                 console.log("texurl=" + texurl);
                 
+                var textureLoad: egret3d.TextureLoader = new egret3d.TextureLoader(texurl);
+                textureLoad.addEventListener(egret3d.Event3D.EVENT_LOAD_COMPLETE,
+                    (e: egret3d.Event3D) =>
+                    {
+                        node.material.diffuseTexture = textureLoad.texture;
+                    }
+                );
+                textureLoad.load();
+
+                //var tloadr = new egret3d.TextureLoader(texurl);
+                
+                //    //
+                //    mat.diffuseTexture = new BABYLON.Texture(box.baseUrl + "/" + matjson["mainTexture"], parent.getScene());
+
+            }
+            //parent.material = mat;
+        }
+        _parseSkinnedMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
+        {
+            console.log("set _parseSkinnedMeshRenderer");
+            node.geometry = new egret3d.SkinGeometry();
+            var geom = <egret3d.SkinGeometry>node.geometry;
+            var meshname = <string>json["mesh"];
+            //var mesh = parent;
+
+            var _data: FreeNode.MeshData = FreeNode.MeshData.loadMesh(box.cacheBin[meshname]);
+            
+            //var bdata: BABYLON.VertexData =// BABYLON.VertexData.CreateTorus(3, 3, 3);
+            //    new BABYLON.VertexData();
+            geom.verticesData = [];
+            //bdata.positions = [];//填充位置数据
+            this.__FillGeomVertex(geom.verticesData, _data, true);
+
+            //bdata.indices = [];//填充索引数据
+            geom.indexData = [];
+            this.__FillGeomIndex(geom.indexData, _data);
+
+            geom.numItems = geom.indexData.length;
+
+            geom.buildGeomtry();
+            geom.buildBoundBox();
+
+            node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
+
+            //end mesh
+
+            node.material = new egret3d.TextureMaterial();
+            node.material.lightGroup = this.lightGroup;
+            node.material.specularColor = 0xffffff;
+            node.material.specularPower = 0.5;
+            node.material.ambientColor = 0x111111;
+
+            node.material.shininess = 10.0;
+
+            var matstr: string = json["mats"][0];
+            var matjson = JSON.parse(box.cacheTxt[matstr]);
+            //var mat = new BABYLON.StandardMaterial("texture1", parent.getScene());
+
+            if (matjson["_Color"] != undefined)
+            {
+                var sp = (<string>matjson["_Color"]).split(",");
+                var r = parseInt(sp[0]) / 255.0;
+                var g = parseInt(sp[1]) / 255.0;
+                var b = parseInt(sp[2]) / 255.0;
+                var a = parseInt(sp[3]) / 255.0;
+                var c = new egret3d.Color(r, g, b, a);
+                node.material.diffuseColor = c.getColor();
+                //    mat.diffuseColor = new BABYLON.Color3(r, g, b);
+                //    mat.alpha = a;
+            }
+            if (matjson["_MainTex"] != undefined)
+            {
+                var tex = matjson["_MainTex"];
+                var texurl = box.cachePic[tex];
+                console.log("texurl=" + texurl);
+
                 var textureLoad: egret3d.TextureLoader = new egret3d.TextureLoader(texurl);
                 textureLoad.addEventListener(egret3d.Event3D.EVENT_LOAD_COMPLETE,
                     (e: egret3d.Event3D) =>

@@ -1,0 +1,5 @@
+{
+    "shaderName":"Legacy Shaders/Diffuse",
+    "_Color":"255,255,255,255",
+    "_MainTex":"F60D35CB8CBD35840EB01DB5E878613B86739AE9.png"
+    }

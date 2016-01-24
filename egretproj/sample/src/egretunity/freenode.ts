@@ -316,11 +316,14 @@ namespace FreeNode
         vec4tangents: Float32Array = null;
         vec2uvs0: Float32Array = null;
         vec2uvs1: Float32Array = null;
-        vec2uvs2: Float32Array = null;
-        //vec2uvs4: Float32Array;
-        //uvs5: number[];
-        //     uvs6: number[];
+
+        //以下两个数据并没什么卵用
+        //vec2uvs2: Float32Array = null;
+        //vec2uvs3: Float32Array;
         vec4colors: Float32Array = null;
+
+        vec10tpose: Float32Array = null;//tpose 使用的是10个float32，pos xyz，scale xyz，quat xyzw
+        vec8widget: Float32Array = null;
         //matricesIndices: number[];
         //matricesWeights: number[];
         indices: SubMesh[];
@@ -350,7 +353,7 @@ namespace FreeNode
                         meshdata.vec3positions[i * 3 + 2] = read.readSingle();//z
                     }
                 }
-                if (tag == 2)//color
+                else if (tag == 2)//color
                 {
                     meshdata.vec4colors = new Float32Array(vcount * 4);
                     for (var i = 0; i < vcount; i++)
@@ -361,7 +364,7 @@ namespace FreeNode
                         meshdata.vec4colors[i * 4 + 4] = read.readUInt8();//b
                     }
                 }
-                if (tag == 3)//normal
+                else if (tag == 3)//normal
                 {
                     meshdata.vec3normals = new Float32Array(vcount * 3);
                     for (var i = 0; i < vcount; i++)
@@ -371,7 +374,7 @@ namespace FreeNode
                         meshdata.vec3normals[i * 3 + 2] = read.readSingle();//z
                     }
                 }
-                if (tag == 4)//uv
+                else if (tag == 4)//uv
                 {
                     meshdata.vec2uvs0 = new Float32Array(vcount * 2);
                     for (var i = 0; i < vcount; i++)
@@ -381,7 +384,7 @@ namespace FreeNode
 
                     }
                 }
-                if (tag == 5)//uv1
+                else if (tag == 5)//uv1
                 {
                     meshdata.vec2uvs1 = new Float32Array(vcount * 2);
                     for (var i = 0; i < vcount; i++)
@@ -391,17 +394,19 @@ namespace FreeNode
 
                     }
                 }
-                if (tag == 6)//uv2
+                else if (tag == 6)//uv2
                 {
-                    meshdata.vec2uvs2 = new Float32Array(vcount * 2);
+                    //meshdata.vec2uvs2 = new Float32Array(vcount * 2);
                     for (var i = 0; i < vcount; i++)
                     {
-                        meshdata.vec2uvs2[i * 2 + 0] = read.readSingle();//u
-                        meshdata.vec2uvs2[i * 2 + 1] = read.readSingle();//v
+                        //meshdata.vec2uvs2[i * 2 + 0] =
+                        read.readSingle();//u
+                        //meshdata.vec2uvs2[i * 2 + 1] =
+                        read.readSingle();//v
 
                     }
                 }
-                if (tag == 7)//tangent
+                else if (tag == 7)//tangent
                 {
                     meshdata.vec4tangents = new Float32Array(vcount * 4);
                     for (var i = 0; i < vcount; i++)
@@ -411,6 +416,54 @@ namespace FreeNode
                         meshdata.vec4tangents[i * 4 + 2] = read.readSingle();//z
                         meshdata.vec4tangents[i * 4 + 4] = read.readSingle();//w
                     }
+                }
+                else if (tag == 8)//uv3
+                {
+                    for (var i = 0; i < vcount; i++)
+                    {
+                        //meshdata.vec2uvs2[i * 2 + 0] =
+                        read.readSingle();//u
+                        //meshdata.vec2uvs2[i * 2 + 1] =
+                        read.readSingle();//v
+
+                    }
+                }
+                else if (tag == 16)//tpose
+                {
+                    var tposelen = read.readUInt8();
+                    meshdata.vec10tpose = new Float32Array(tposelen * 2);
+                    for (var i = 0; i < tposelen; i++)
+                    {
+                        meshdata.vec10tpose[i * 10 + 0] = read.readSingle();//posx;
+                        meshdata.vec10tpose[i * 10 + 1] = read.readSingle();//posy;
+                        meshdata.vec10tpose[i * 10 + 2] = read.readSingle();//posz;
+                        meshdata.vec10tpose[i * 10 + 3] = read.readSingle();//scalex;
+                        meshdata.vec10tpose[i * 10 + 4] = read.readSingle();//scaley;
+                        meshdata.vec10tpose[i * 10 + 5] = read.readSingle();//scalez;
+                        meshdata.vec10tpose[i * 10 + 6] = read.readSingle();//quatx;
+                        meshdata.vec10tpose[i * 10 + 7] = read.readSingle();//quaty;
+                        meshdata.vec10tpose[i * 10 + 8] = read.readSingle();//quatz;
+                        meshdata.vec10tpose[i * 10 + 9] = read.readSingle();//quatw;
+                    }
+                }
+                else if (tag == 17)//skinwidget;
+                {
+                    meshdata.vec8widget = new Float32Array(vcount * 8);
+                    for (var i = 0; i < vcount; i++)
+                    {
+                        meshdata.vec10tpose[i * 8 + 0] = read.readUInt32();//index0;
+                        meshdata.vec10tpose[i * 8 + 1] = read.readUInt32();//index1;
+                        meshdata.vec10tpose[i * 8 + 2] = read.readUInt32();//index2;
+                        meshdata.vec10tpose[i * 8 + 3] = read.readUInt32();//index3;
+                        meshdata.vec10tpose[i * 8 + 4] = read.readSingle();//widget0;
+                        meshdata.vec10tpose[i * 8 + 5] = read.readSingle();//widget1;
+                        meshdata.vec10tpose[i * 8 + 6] = read.readSingle();//widget2;
+                        meshdata.vec10tpose[i * 8 + 7] = read.readSingle();//widget3;
+                    }
+                }
+                else
+                {
+                    throw "notwrite" + tag;
                 }
             }
 

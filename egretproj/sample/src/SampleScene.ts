@@ -85,7 +85,7 @@ class SampleScene
         //设置像机视野距离;
         this._cameraCtl.setEyesLength(10);
         //加载场景文件，此处会自动加载所有相关资源到streambox中
-        var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/Cube.indexlist.txt", () =>
+        var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/cube.indexlist.txt", () =>
         {
             console.warn("index loaded.");
             

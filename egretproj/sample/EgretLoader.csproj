@@ -39,10 +39,18 @@
     <Content Include="favicon.ico" />
     <Content Include="libs\egret3d.js" />
     <Content Include="resource\cube.indexlist.txt" />
+    <Content Include="resource\diaochan.indexlist.txt" />
     <Content Include="resource\resources\031671B38D50DDA0BAAF6F557000B0F526358B34.jsontree.txt" />
+    <Content Include="resource\resources\0CF8C50AFAC691C5E27E6C88FB7B011A9080024B.jsonmat.txt" />
     <Content Include="resource\resources\13DB3968662D61AA5379D3262707FBA083EAFCE0.jsontree.txt" />
+    <Content Include="resource\resources\2177BA27BF0973D4CC3EC21E8F8C2A07FD15CAA2.jsonmat.txt" />
     <Content Include="resource\resources\39E7D4DA34D276E2E1D883CE421433992A55F4F7.jsontree.txt" />
+    <Content Include="resource\resources\4726D31C6049CA18F76A3985959B363976099EB9.png" />
+    <Content Include="resource\resources\5C4E015884505E426503427F95A73D0711BA16D6.jsontree.txt" />
+    <Content Include="resource\resources\850EC323CBAEF598749ABBDE0AAF446259B201A0.jsonmat.txt" />
     <Content Include="resource\resources\CC42A1F881BB05FBDD7895CB0E9AD4A674BCF207.jsontree.txt" />
+    <Content Include="resource\resources\F60D35CB8CBD35840EB01DB5E878613B86739AE9.png" />
+    <Content Include="resource\resources\FDE3AB162610906F8A6A81941E5EC5717D50E566.jsontree.txt" />
     <Content Include="resource\root.indexlist.txt" />
     <Content Include="resource\SkyBox\BlueNebula2048_back.jpg" />
     <Content Include="resource\SkyBox\BlueNebula2048_bottom.jpg" />
@@ -199,7 +207,10 @@
     <Compile Include="template\runtime\runtime_loader.js" />
     <Compile Include="template\runtime\native_require.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="resource\resources\9DD0B0173599C2C5C5920177BEB5D13E5CA34AE1.mesh.bin" />
+    <Content Include="resource\resources\C52CE6AE1CFFC08ADAAFD795D149DD4E8C251EDF.mesh.bin" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="resource\resources\4933809336A86B21DAC55A90A6FA502BCE1D06D0.mesh.bin" />
     <Content Include="resource\resources\9BAC60AFBEF64A6CCF8659AE78ED6F2F0F0C7A1D.mesh.bin" />
