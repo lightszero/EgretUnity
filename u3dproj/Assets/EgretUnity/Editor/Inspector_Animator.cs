@@ -11,13 +11,17 @@ public class Animator_Inspector : Editor
 {
     //
     Dictionary<string, float> anipos = new Dictionary<string, float>();
+    AnimationClip playclip;
+    DateTime last = DateTime.Now;
+    float timer = 0;
     public override void OnInspectorGUI()
     {
         if (this.target == null) return;
         base.OnInspectorGUI();
         if (Application.isPlaying) return;
 
-        EditorGUILayout.HelpBox("这里增加一个Inspector,用来检查动画和产生CleanData.Ani", MessageType.Info);
+        EditorGUILayout.HelpBox("这里增加一个Inspector,用来检查动画", MessageType.Info);
+        EditorGUILayout.HelpBox("你只需要把所有的动画拖入一个controller就行了，然后我们就会导出他", MessageType.Info);
 
         //GUILayout.Label("1:" + this.serializedObject);
         //GUILayout.Label("2:" + this.target);
@@ -38,12 +42,25 @@ public class Animator_Inspector : Editor
                 {
                     if (c == null) continue;
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(c.name + "(" + c.length * c.frameRate + ")" +(c.isLooping?"loop":""));
-                    //if (GUILayout.Button("Create FBAniClip", GUILayout.Width(150)))
-                    //{
-                    //    //CloneAni(c, c.frameRate);
-                    //}
+                    GUILayout.Label(c.name + "(" + c.length * c.frameRate + ")" + (c.isLooping ? "loop" : ""));
 
+                    if (playclip == c)
+                    {
+                        if (GUILayout.Button("Stop", GUILayout.Width(150)))
+                        {
+                            playclip = null;
+                        }
+                    }
+                    else
+                    {
+                        if (GUILayout.Button("Play", GUILayout.Width(150)))
+                        {
+                            playclip = c;
+                            ani.Play(c.name, 0, 0);
+                            timer = 0;
+                            //    //CloneAni(c, c.frameRate);
+                        }
+                    }
                     GUILayout.EndHorizontal();
                     if (anipos.ContainsKey(c.name) == false)
                     {
@@ -57,15 +74,33 @@ public class Animator_Inspector : Editor
                         anipos[c.name] = v;
                         ani.Play(c.name, 0, v / c.length);
                         ani.updateMode = AnimatorUpdateMode.UnscaledTime;
-                        ani.Update(0.001f);
+                        ani.Update(0);// 0.001f);
+
+                        playclip = null;
                     }
                 }
+
             }
+        }
+        if (playclip!=null)
+        {
+            DateTime _now = DateTime.Now;
+            float delta = (float)(_now - last).TotalSeconds;
+            last = _now;
+            
+            ani.Update(delta);
+            timer += delta;
+            if (playclip.isLooping==false&& timer >= playclip.length)
+            {
+                playclip = null;
+                timer = 0;
+            }
+            Repaint();
         }
     }
     //void CloneAni(AnimationClip clip, float fps)
     //{
-        
+
     //    var ani = target as Animator;
 
     //    //创建CleanData.Ani

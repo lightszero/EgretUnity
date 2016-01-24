@@ -1,0 +1,1 @@
+{"name":"Legacy Shaders/Diffuse","params":{"_Color":{"name":"_Color","type":"Color","flags":"None"},"_MainTex":{"name":"_MainTex","type":"Texture","flags":"None","texdim":"Tex2D"}}}

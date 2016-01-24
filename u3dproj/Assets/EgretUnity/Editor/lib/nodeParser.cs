@@ -27,6 +27,7 @@ namespace nodeParser
             RegComponentParser(new ComponetParser_MeshFilter());
             RegComponentParser(new ComponetParser_MeshRenderer());
             RegComponentParser(new ComponetParser_BoxCollider());
+            RegComponentParser(new ComponetParser_SkinnedMeshRenderer());
 
             matParsers = new Dictionary<string, MatParser>();
             //RegMatParser(new matparser_standard());

@@ -55,6 +55,96 @@ public class BitHelper
         vec.w = BitConverter.ToSingle(buf, pos + 12);
         return vec;
     }
+    public static byte[] getBytes(Quaternion pos)
+    {
+        byte[] buf = new byte[16];
+        BitConverter.GetBytes(pos.x).CopyTo(buf, 0);
+        BitConverter.GetBytes(pos.y).CopyTo(buf, 4);
+        BitConverter.GetBytes(pos.z).CopyTo(buf, 8);
+        BitConverter.GetBytes(pos.w).CopyTo(buf, 12);
+        return buf;
+    }
+    public static Quaternion ToQuaternion(byte[] buf, int pos)
+    {
+        Quaternion vec;
+        vec.x = BitConverter.ToSingle(buf, pos + 0);
+        vec.y = BitConverter.ToSingle(buf, pos + 4);
+        vec.z = BitConverter.ToSingle(buf, pos + 8);
+        vec.w = BitConverter.ToSingle(buf, pos + 12);
+        return vec;
+    }
+    public static void MatrixDeCompose(Matrix4x4 m, out Vector3 pos, out Vector3 scale, out Vector3 ruler, out Quaternion quat)
+    {
+        //pos
+        pos = new Vector3(m.m03, m.m13, m.m23);
+        m.m03 = 0; m.m13 = 0; m.m23 = 0;
+
+        //scale
+        scale = new Vector3();
+        scale.x = Mathf.Sqrt(m.m00 * m.m00 + m.m10 * m.m10 + m.m20 * m.m20);
+        scale.y = Mathf.Sqrt(m.m01 * m.m01 + m.m11 * m.m11 + m.m21 * m.m21);
+        scale.z = Mathf.Sqrt(m.m02 * m.m02 + m.m12 * m.m12 + m.m22 * m.m22);
+        if ((m.m00 * (m.m11 * m.m22 - m.m21 * m.m12)
+            - m.m10 * (m.m01 * m.m02 - m.m21 * m.m02)
+            + m.m20 * (m.m01 * m.m12 - m.m11 * m.m02))
+            < 0)
+        {
+            scale.z = -scale.z;
+        }
+        m.m00 /= scale.x; m.m10 /= scale.x; m.m20 /= scale.x;
+        m.m01 /= scale.y; m.m11 /= scale.y; m.m21 /= scale.y;
+        m.m02 /= scale.z; m.m12 /= scale.z; m.m22 /= scale.z;
+
+        //ruler
+        ruler = new Vector3();
+        ruler.y = Mathf.Asin(-m.m20);
+
+        if (m.m20 != 1 && m.m20 != -1)
+        {
+            ruler.x = Mathf.Atan2(m.m21, m.m22);
+            ruler.z = Mathf.Atan2(m.m10, m.m00);
+        }
+        else
+        {
+            ruler.z = 0;
+            ruler.x = Mathf.Atan2(m.m01, m.m11);
+        }
+        //
+        quat = new Quaternion();
+        float tr = m.m00 + m.m11 + m.m22;
+
+        if (tr > 0)
+        {
+            quat.w = Mathf.Sqrt(1 + tr) / 2;
+
+            quat.x = (m.m21 - m.m12) / (4 * quat.w);
+            quat.y = (m.m02 - m.m20) / (4 * quat.w);
+            quat.z = (m.m10 - m.m01) / (4 * quat.w);
+        }
+        else if ((m.m01 > m.m11) && (m.m00 > m.m22))
+        {
+            quat.x = Mathf.Sqrt(1 + m.m00 - m.m11 - m.m22) / 2;
+
+            quat.w = (m.m21 - m.m12) / (4 * quat.x);
+            quat.y = (m.m10 + m.m01) / (4 * quat.x);
+            quat.z = (m.m02 + m.m20) / (4 * quat.x);
+        }
+        else if (m.m11 > m.m22)
+        {
+            quat.y = Mathf.Sqrt(1 + m.m11 - m.m00 - m.m22) / 2;
+
+            quat.x = (m.m10 + m.m01) / (4 * quat.y);
+            quat.w = (m.m02 - m.m20) / (4 * quat.y);
+            quat.z = (m.m21 + m.m12) / (4 * quat.y);
+        }
+        else {
+            quat.z = Mathf.Sqrt(1 + m.m22 - m.m00 - m.m11) / 2;
+
+            quat.x = (m.m02 + m.m20) / (4 * quat.z);
+            quat.y = (m.m21 + m.m12) / (4 * quat.z);
+            quat.w = (m.m10 - m.m01) / (4 * quat.z);
+        }
+    }
     public static byte[] getBytes(Bounds bound)
     {
         byte[] buf = new byte[24];
@@ -178,18 +268,18 @@ public class BitHelper
         }
         if (mesh.uv2 != null && mesh.uv2.Length != 0)
         {
-            s.WriteByte(5);//5 vb uv1 tag;
+            s.WriteByte(5);//5 vb uv2 tag;
             for (int i = 0; i < vc; i++)
             {
                 s.Write(BitHelper.getBytes(mesh.uv2[i]), 0, 8);
             }
         }
-        if (mesh.uv2 != null && mesh.uv2.Length != 0)
+        if (mesh.uv3 != null && mesh.uv3.Length != 0)
         {
-            s.WriteByte(6);//6 vb uv2 tag;
+            s.WriteByte(6);//6 vb uv3 tag;
             for (int i = 0; i < vc; i++)
             {
-                s.Write(BitHelper.getBytes(mesh.uv[i]), 0, 8);
+                s.Write(BitHelper.getBytes(mesh.uv3[i]), 0, 8);
             }
         }
         if (mesh.tangents != null && mesh.tangents.Length != 0)
@@ -198,6 +288,49 @@ public class BitHelper
             for (int i = 0; i < vc; i++)
             {
                 s.Write(BitHelper.getBytes(mesh.tangents[i]), 0, 16);
+            }
+        }
+        if (mesh.uv4 != null && mesh.uv4.Length != 0)
+        {
+            s.WriteByte(8);//8 vb uv4 tag;
+            for (int i = 0; i < vc; i++)
+            {
+                s.Write(BitHelper.getBytes(mesh.uv4[i]), 0, 8);
+            }
+        }
+        if (mesh.bindposes != null && mesh.bindposes.Length != 0)
+        {
+            s.WriteByte(16);//16 bindposes
+            s.WriteByte((byte)mesh.bindposes.Length);//length diff
+            for (int i = 0; i < mesh.bindposes.Length; i++)
+            {
+                Vector3 pos;
+                Vector3 scale;
+                Vector3 ruler;
+                Quaternion quat;
+                BitHelper.MatrixDeCompose(mesh.bindposes[i], out pos, out scale, out ruler, out quat);
+                //Quaternion quat = Quaternion.Euler(ruler);
+                s.Write(BitHelper.getBytes(pos), 0, 12);
+                s.Write(BitHelper.getBytes(scale), 0, 12);
+                s.Write(BitHelper.getBytes(quat), 0, 16);
+                //Debug.Log(mesh.bindposes[i] + "\n pos:" + pos + "\n scale:" + scale + "\n ruler:" + ruler);
+                //test
+                mesh.bindposes[i] = Matrix4x4.TRS(pos, quat, scale);
+            }
+        }
+        if (mesh.boneWeights != null && mesh.boneWeights.Length != 0)
+        {
+            s.WriteByte(17);//17 bindposes
+            for (int i = 0; i < vc; i++)
+            {
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].boneIndex0), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].boneIndex1), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].boneIndex2), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].boneIndex3), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].weight0), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].weight1), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].weight2), 0, 4);
+                s.Write(BitConverter.GetBytes(mesh.boneWeights[i].weight3), 0, 4);
             }
         }
         s.WriteByte(255);//vb end
@@ -295,7 +428,7 @@ public class BitHelper
                 }
                 m.uv = uvs;
             }
-            if (tag == 5)//uv1
+            if (tag == 5)//uv2
             {
                 Vector2[] uvs = new Vector2[vcount];
                 for (int i = 0; i < vcount; i++)
@@ -305,7 +438,7 @@ public class BitHelper
                 }
                 m.uv2 = uvs;
             }
-            if (tag == 6)//uv2
+            if (tag == 6)//uv3
             {
                 Vector2[] uvs = new Vector2[vcount];
                 for (int i = 0; i < vcount; i++)
@@ -313,7 +446,7 @@ public class BitHelper
                     uvs[i] = BitHelper.ToVector2(data, seek);
                     seek += 8;
                 }
-                m.uv2 = uvs;
+                m.uv3 = uvs;
             }
             if (tag == 7)
             {
@@ -324,6 +457,51 @@ public class BitHelper
                     seek += 16;
                 }
                 m.tangents = tangents;
+            }
+            if (tag == 8)//uv4
+            {
+                Vector2[] uvs = new Vector2[vcount];
+                for (int i = 0; i < vcount; i++)
+                {
+                    uvs[i] = BitHelper.ToVector2(data, seek);
+                    seek += 8;
+                }
+                m.uv4 = uvs;
+            }
+            if (tag == 16)
+            {
+                int len = data[seek]; seek++;
+                //s.WriteByte((byte)mesh.bindposes.Length);//length diff
+                Matrix4x4[] bindpose = new Matrix4x4[len];
+
+                for (int i = 0; i < len; i++)
+                {
+                    Vector3 pos = BitHelper.ToVector3(data, seek);
+                    seek += 12;
+                    Vector3 scale = BitHelper.ToVector3(data, seek);
+                    seek += 12;
+                    Quaternion quat = BitHelper.ToQuaternion(data, seek);
+                    seek += 16;
+                    bindpose[i] = Matrix4x4.TRS(pos, quat, scale);
+                }
+                m.bindposes = bindpose;
+            }
+            if (tag == 17)
+            {
+                BoneWeight[] weights = new BoneWeight[vcount];
+
+                for (int i = 0; i < vcount; i++)
+                {
+                    weights[i].boneIndex0 = BitConverter.ToInt32(data, seek); seek += 4;
+                    weights[i].boneIndex1 = BitConverter.ToInt32(data, seek); seek += 4;
+                    weights[i].boneIndex2 = BitConverter.ToInt32(data, seek); seek += 4;
+                    weights[i].boneIndex3 = BitConverter.ToInt32(data, seek); seek += 4;
+                    weights[i].weight0 = BitConverter.ToSingle(data, seek); seek += 4;
+                    weights[i].weight1 = BitConverter.ToSingle(data, seek); seek += 4;
+                    weights[i].weight2 = BitConverter.ToSingle(data, seek); seek += 4;
+                    weights[i].weight3 = BitConverter.ToSingle(data, seek); seek += 4;
+                }
+                m.boneWeights = weights;
             }
         }
         int subcount = data[seek];
