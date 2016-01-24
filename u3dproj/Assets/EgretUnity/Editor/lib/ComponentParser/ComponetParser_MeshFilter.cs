@@ -27,7 +27,7 @@ namespace nodeParser
 #endif
 
         }
-        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json)
+        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json, DelayProcess dp)
         {
             MeshFilter c = node.GetComponent(comptype) as MeshFilter;
             if (c == null)//这就可能了

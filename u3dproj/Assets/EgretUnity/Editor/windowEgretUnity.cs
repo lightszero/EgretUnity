@@ -2,11 +2,12 @@
 using System.Collections;
 using UnityEditor;
 using System;
+using System.Collections.Generic;
 
 public class windowEgretUnity : EditorWindow
 {
 
-    public const string version = "v0.02";
+    public const string version = "v0.03";
     #region windowinit
     [MenuItem("EgretUnity/ShowResExportWindow")]
     static void ShowWindow()
@@ -22,6 +23,7 @@ public class windowEgretUnity : EditorWindow
     string exportPath = null;//导出路径
     bool bUseHashTreeName = false;//是否使用hash作为导出节点名
     string exportNodeName = "";//导出节点名称
+    string[] importfiles;
     #endregion
     void OnGUI()
     {
@@ -31,10 +33,17 @@ public class windowEgretUnity : EditorWindow
             rp = System.IO.Path.GetDirectoryName(rp);
             rp = System.IO.Path.GetDirectoryName(rp);
             exportPath = System.IO.Path.Combine(rp, "export");
+            importfiles = System.IO.Directory.GetFiles(exportPath, "*.indexlist.txt");
             Debug.Log("outpath=" + exportPath);
         }
         GUILayout.Label("设置导出路径");
-        exportPath = EditorGUILayout.TextField("export path", exportPath);
+        var _exportPath = EditorGUILayout.TextField("export path", exportPath);
+        if (_exportPath != exportPath)
+        {
+            exportPath = _exportPath;
+            importfiles = System.IO.Directory.GetFiles(exportPath, "*.indexlist.txt");
+
+        }
         GUILayout.Space(12);
 
         GUILayout.Label("选择一个Gameobject 将他导出");
@@ -64,6 +73,7 @@ public class windowEgretUnity : EditorWindow
             if (setobj != null)
             {
                 SaveItem();
+                importfiles = System.IO.Directory.GetFiles(exportPath, "*.indexlist.txt");
             }
             else
             {
@@ -71,9 +81,42 @@ public class windowEgretUnity : EditorWindow
             }
         }
 
+        GUILayout.Space(30);
+
+        if (importfiles != null && importfiles.Length > 0)
+        {
+            GUILayout.Label("下面是加载测试");
+            foreach (var f in importfiles)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("File:" + f);
+                if (GUILayout.Button("Import", GUILayout.Width(150)))
+                {
+                    LoadItem(f);
+                }
+                GUILayout.EndHorizontal();
+            }
+        }
 
     }
+    void LoadItem(string filename)
+    {
+        string jsontxt = System.Text.Encoding.UTF8.GetString(System.IO.File.ReadAllBytes(filename));
+        MyJson.JsonNode_Array array = MyJson.Parse(jsontxt) as MyJson.JsonNode_Array;
+        Dictionary<string, byte[]> bufs = new Dictionary<string, byte[]>();
+        foreach (MyJson.JsonNode_Object indexitem in array)
+        {
+            string name = indexitem["Name"].AsString();
+            int len = indexitem["Length"].AsInt();
+            bufs[System.IO.Path.GetFileName(name)] = System.IO.File.ReadAllBytes(exportPath + "/" + name);
+            //Debug.Log(name);
 
+        }
+        nodeParser.nodeParser np = new nodeParser.nodeParser();
+
+        np.SetBufs(bufs);
+        np.GenNode();
+    }
     void SaveItem()
     {
         //GameObject setobj = null;//选中的对象

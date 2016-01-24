@@ -73,77 +73,21 @@ public class BitHelper
         vec.w = BitConverter.ToSingle(buf, pos + 12);
         return vec;
     }
-    public static void MatrixDeCompose(Matrix4x4 m, out Vector3 pos, out Vector3 scale, out Vector3 ruler, out Quaternion quat)
+    public static void MatrixDeCompose(Matrix4x4 m, out Vector3 pos, out Vector3 scale, out Quaternion quat)
     {
+        //quat
+        Vector3 vf = m.MultiplyVector(Vector3.forward);
+        Vector3 vu = m.MultiplyVector(Vector3.up);
+        quat = Quaternion.LookRotation(vf, vu);
         //pos
         pos = new Vector3(m.m03, m.m13, m.m23);
+        //去掉旋转和偏移
         m.m03 = 0; m.m13 = 0; m.m23 = 0;
-
+        Matrix4x4 im = Matrix4x4.TRS(Vector3.zero, quat, Vector3.one);
+        m*=im.inverse;
         //scale
-        scale = new Vector3();
-        scale.x = Mathf.Sqrt(m.m00 * m.m00 + m.m10 * m.m10 + m.m20 * m.m20);
-        scale.y = Mathf.Sqrt(m.m01 * m.m01 + m.m11 * m.m11 + m.m21 * m.m21);
-        scale.z = Mathf.Sqrt(m.m02 * m.m02 + m.m12 * m.m12 + m.m22 * m.m22);
-        if ((m.m00 * (m.m11 * m.m22 - m.m21 * m.m12)
-            - m.m10 * (m.m01 * m.m02 - m.m21 * m.m02)
-            + m.m20 * (m.m01 * m.m12 - m.m11 * m.m02))
-            < 0)
-        {
-            scale.z = -scale.z;
-        }
-        m.m00 /= scale.x; m.m10 /= scale.x; m.m20 /= scale.x;
-        m.m01 /= scale.y; m.m11 /= scale.y; m.m21 /= scale.y;
-        m.m02 /= scale.z; m.m12 /= scale.z; m.m22 /= scale.z;
+        scale = new Vector3(m.m00, m.m11, m.m22);
 
-        //ruler
-        ruler = new Vector3();
-        ruler.y = Mathf.Asin(-m.m20);
-
-        if (m.m20 != 1 && m.m20 != -1)
-        {
-            ruler.x = Mathf.Atan2(m.m21, m.m22);
-            ruler.z = Mathf.Atan2(m.m10, m.m00);
-        }
-        else
-        {
-            ruler.z = 0;
-            ruler.x = Mathf.Atan2(m.m01, m.m11);
-        }
-        //
-        quat = new Quaternion();
-        float tr = m.m00 + m.m11 + m.m22;
-
-        if (tr > 0)
-        {
-            quat.w = Mathf.Sqrt(1 + tr) / 2;
-
-            quat.x = (m.m21 - m.m12) / (4 * quat.w);
-            quat.y = (m.m02 - m.m20) / (4 * quat.w);
-            quat.z = (m.m10 - m.m01) / (4 * quat.w);
-        }
-        else if ((m.m01 > m.m11) && (m.m00 > m.m22))
-        {
-            quat.x = Mathf.Sqrt(1 + m.m00 - m.m11 - m.m22) / 2;
-
-            quat.w = (m.m21 - m.m12) / (4 * quat.x);
-            quat.y = (m.m10 + m.m01) / (4 * quat.x);
-            quat.z = (m.m02 + m.m20) / (4 * quat.x);
-        }
-        else if (m.m11 > m.m22)
-        {
-            quat.y = Mathf.Sqrt(1 + m.m11 - m.m00 - m.m22) / 2;
-
-            quat.x = (m.m10 + m.m01) / (4 * quat.y);
-            quat.w = (m.m02 - m.m20) / (4 * quat.y);
-            quat.z = (m.m21 + m.m12) / (4 * quat.y);
-        }
-        else {
-            quat.z = Mathf.Sqrt(1 + m.m22 - m.m00 - m.m11) / 2;
-
-            quat.x = (m.m02 + m.m20) / (4 * quat.z);
-            quat.y = (m.m21 + m.m12) / (4 * quat.z);
-            quat.w = (m.m10 - m.m01) / (4 * quat.z);
-        }
     }
     public static byte[] getBytes(Bounds bound)
     {
@@ -306,17 +250,15 @@ public class BitHelper
             {
                 Vector3 pos;
                 Vector3 scale;
-                Vector3 ruler;
                 Quaternion quat;
-                BitHelper.MatrixDeCompose(mesh.bindposes[i], out pos, out scale, out ruler, out quat);
-                //Quaternion quat = Quaternion.Euler(ruler);
+                BitHelper.MatrixDeCompose(mesh.bindposes[i], out pos, out scale, out quat);
                 s.Write(BitHelper.getBytes(pos), 0, 12);
                 s.Write(BitHelper.getBytes(scale), 0, 12);
                 s.Write(BitHelper.getBytes(quat), 0, 16);
-                //Debug.Log(mesh.bindposes[i] + "\n pos:" + pos + "\n scale:" + scale + "\n ruler:" + ruler);
-                //test
-                mesh.bindposes[i] = Matrix4x4.TRS(pos, quat, scale);
+                //Debug.Log(mesh.bindposes[i] + "\n pos:" + pos + "\n scale:" + scale  + "\n quat:" + quat + "\n euler:" + quat.ToEuler());
             }
+            //mesh.bindposes = mesh.bindposes;
+            //mesh.UploadMeshData(false);
         }
         if (mesh.boneWeights != null && mesh.boneWeights.Length != 0)
         {

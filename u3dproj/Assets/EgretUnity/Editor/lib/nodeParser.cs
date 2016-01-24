@@ -53,7 +53,7 @@ namespace nodeParser
         public void InitMatParser(string shader, MyJson.JsonNode_Object json)
         {
             string name = shader.Replace("%2f", "/");
-            Debug.Log("InitMatParser:" + name);
+            //Debug.Log("InitMatParser:" + name);
             matParsers[name] = new MatParser(name, json);
         }
         public List<MatParser> GetAllMatParsers()
@@ -109,8 +109,25 @@ namespace nodeParser
                 Debug.Log(m);
             }
             if (matParsers.ContainsKey(shaderName) == false)
-                return null;
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("try load shader:" + shaderName);
+                string path = Application.dataPath + "/resources/shaderparser";
+                if (System.IO.Directory.Exists(path) == false)
+                    System.IO.Directory.CreateDirectory(path);
 
+                //string shadername = mat.shader.name;
+                //shadername = shadername.Replace("/", "%2f");
+                var shaderfileName = shaderName.Replace("/", "%2f");
+                string file = path + "/" + shaderfileName + ".shaderparser.txt";
+                byte[] jsonbyte = System.IO.File.ReadAllBytes(file);
+                string jsontxt = System.Text.Encoding.UTF8.GetString(jsonbyte);
+                MyJson.JsonNode_Object _json = MyJson.Parse(jsontxt) as MyJson.JsonNode_Object;
+                InitMatParser(shaderfileName, _json);
+                return GetMatParser(shaderName);
+#endif
+                return null;
+            }
 
             return matParsers[shaderName];
         }
@@ -167,22 +184,28 @@ namespace nodeParser
             MyJson.JsonNode_Object _json = MyJson.Parse(treefile) as MyJson.JsonNode_Object;
 
             _obj = new GameObject();
-            Json2Obj(_json, _obj);
+            DelayProcess dp = new DelayProcess();
+            Json2Obj(_json, _obj, dp);
+            dp.Do();
             return _obj;
 
         }
 
-        void Json2Obj(MyJson.JsonNode_Object _json, GameObject _obj)
+        void Json2Obj(MyJson.JsonNode_Object _json, GameObject _obj, DelayProcess dp)
         {
             _obj.name = _json["name"].AsString();
             var comps = _json["components"].AsList();
-
+            if (_json.ContainsKey("id"))
+            {
+                var id = _json["id"].AsInt();
+                dp.mapObjs[id] = _obj;
+            }
             //遍历填充组件
             foreach (MyJson.JsonNode_Object c in comps)
             {
 
                 string type = c["type"].AsString();
-                this.componentParsers[type].ReadFromJson(resmgr, _obj, c);
+                this.componentParsers[type].ReadFromJson(resmgr, _obj, c,dp);
             }
 
             //遍历填充树
@@ -193,7 +216,7 @@ namespace nodeParser
                 {
                     GameObject subobj = new GameObject();
                     subobj.transform.SetParent(_obj.transform);
-                    Json2Obj(subjson, subobj);
+                    Json2Obj(subjson, subobj, dp);
                 }
             }
 
@@ -201,7 +224,7 @@ namespace nodeParser
         void Obj2Json(GameObject _obj, MyJson.JsonNode_Object _json)
         {
             _json["name"] = new MyJson.JsonNode_ValueString(_obj.name);
-
+            _json["id"] = new MyJson.JsonNode_ValueNumber(_obj.GetInstanceID());
             //遍历填充组件
             MyJson.JsonNode_Array comps = new MyJson.JsonNode_Array();
             _json["components"] = comps;
@@ -242,6 +265,7 @@ namespace nodeParser
 
         }
     }
+
 
     public class ResMgr : IResMgr
     {
@@ -418,7 +442,7 @@ namespace nodeParser
             {
                 return mat;
             }
-
+            //Debug.Log("getmat:" + name);
             byte[] buf = bufs[name];
             string str = System.Text.Encoding.UTF8.GetString(buf);
             MyJson.JsonNode_Object json = MyJson.Parse(str) as MyJson.JsonNode_Object;

@@ -34,6 +34,18 @@ namespace nodeParser
         Material GetMat(string name);
         Texture2D GetTexture(string name);
     }
+    public class DelayProcess
+    {
+        public Dictionary<int, GameObject> mapObjs = new Dictionary<int, GameObject>();
+        public void Do()
+        {
+            if (delayCall != null)
+            {
+                delayCall();
+            }
+        }
+        public event Action delayCall;
+    }
     public interface IComponetParser//组件处理器
     {
         Type comptype
@@ -41,7 +53,7 @@ namespace nodeParser
             get;
         }
         void WriteToJson(IResMgr resmgr, GameObject node, Component component, MyJson.JsonNode_Object json);
-        Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json);
+        Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json, DelayProcess dp);
     }
 
 }

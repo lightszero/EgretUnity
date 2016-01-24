@@ -27,7 +27,7 @@ namespace nodeParser
             json["size"] = new MyJson.JsonNode_ValueString(StringHelper.ToString(ic.size));
 
         }
-        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json)
+        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json,DelayProcess dp)
         {
             BoxCollider c = node.GetComponent(comptype) as BoxCollider;
             if (c == null)

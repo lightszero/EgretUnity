@@ -39,8 +39,16 @@ namespace nodeParser
             //mesh
             json["mesh"] = new MyJson.JsonNode_ValueString(resmgr.SaveMesh(ic.sharedMesh));
 
+            json["rootboneobj"] = new MyJson.JsonNode_ValueNumber(ic.rootBone.gameObject.GetInstanceID());
+            MyJson.JsonNode_Array bones = new MyJson.JsonNode_Array();
+            foreach (var b in ic.bones)
+            {
+                bones.Add(new MyJson.JsonNode_ValueNumber(b.gameObject.GetInstanceID()));
+            }
+            json["boneobjs"] = bones;
+            ic.rootBone.GetInstanceID();
         }
-        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json)
+        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json, DelayProcess dp)
         {
             SkinnedMeshRenderer c = node.GetComponent(comptype) as SkinnedMeshRenderer;
             if (c == null)//这就可能了
@@ -59,11 +67,33 @@ namespace nodeParser
             var center = StringHelper.ToVector3(json["center"].AsString());
             var size = StringHelper.ToVector3(json["size"].AsString());
 
-            c.localBounds =new Bounds(center, size);
+            c.localBounds = new Bounds(center, size);
 
             //mesh
             var mesh = resmgr.GetMesh(json["mesh"].AsString());
             c.sharedMesh = mesh;
+
+            //延迟恢复
+            if (json.ContainsKey("rootboneobj"))
+            {
+                dp.delayCall += () =>
+                {
+                    c.rootBone = dp.mapObjs[json["rootboneobj"].AsInt()].transform;
+                };
+            }
+            if (json.ContainsKey("boneobjs"))
+            {
+                dp.delayCall += () =>
+                  {
+                      var array = json["boneobjs"] as MyJson.JsonNode_Array;
+                      List<Transform> bones = new List<Transform>();
+                      foreach (var b in array)
+                      {
+                          bones.Add(dp.mapObjs[b.AsInt()].transform);
+                      }
+                      c.bones = bones.ToArray();
+                  };
+            }
             return c;
         }
 

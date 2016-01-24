@@ -28,13 +28,13 @@ namespace nodeParser
             json["transscale"] = new MyJson.JsonNode_ValueString(StringHelper.ToString(ic.localScale));
 
         }
-        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json)
+        public Component ReadFromJson(IResMgr resmgr, GameObject node, MyJson.JsonNode_Object json, DelayProcess dp)
         {
             Transform c = node.GetComponent(comptype) as Transform;
             if (c == null)//这并不可能,只是例子
                 c = node.AddComponent<Transform>();
-            Debug.Log(c);
-            Debug.Log("tag=" + json);
+            //Debug.Log(c);
+            //Debug.Log("tag=" + json);
             var move = StringHelper.ToVector3(json["transmove"].AsString());
             var euler = StringHelper.ToQuaternion(json["transquat"].AsString());
             var scale = StringHelper.ToVector3(json["transscale"].AsString());
