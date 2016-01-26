@@ -147,16 +147,22 @@ namespace FreeNode.ForEgret3D
 
         __FillSkeleton(skeleton: egret3d.Skeleton, _data: MeshData): void
         {
+            skeleton.joints = [];
             for (var i = 0; i < _data.vec10tpose.length / 10; i++)
             {
-                skeleton.joints = [];
                 var joint: egret3d.Joint = new egret3d.Joint("sk" + i);
+                
                 joint.translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
                 joint.scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
                 joint.orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
                 joint.setLocalTransform(joint.orientation, joint.scale, joint.translation);
+                joint.setInverseBindPose(joint.translation, joint.orientation.toEulerAngles(), joint.scale);
+
                 skeleton.joints.push(joint);
             }
+            skeleton.numJoint = skeleton.joints.length;
+            //skeleton.reset();
+
         }
         __FillGeomVertex(verticesData: number[], _data: MeshData, withskin: boolean): void
         {
@@ -223,7 +229,7 @@ namespace FreeNode.ForEgret3D
                     var uvx = _data.vec2uvs0[i * 2 + 0];
                     var uvy = _data.vec2uvs0[i * 2 + 1];
                     verticesData.push(uvx);//uv0
-                    verticesData.push(uvy);
+                    verticesData.push(1 - uvy);
                 }
                 else
                 {
@@ -235,7 +241,7 @@ namespace FreeNode.ForEgret3D
                     var uvx = _data.vec2uvs1[i * 2 + 0];
                     var uvy = _data.vec2uvs1[i * 2 + 1];
                     verticesData.push(uvx);//uv1
-                    verticesData.push(uvy);
+                    verticesData.push(1 - uvy);
                 }
                 else
                 {
@@ -244,14 +250,33 @@ namespace FreeNode.ForEgret3D
                 }
                 if (withskin == true)
                 {
-                    verticesData.push(0);//index0;
-                    verticesData.push(0);//index1
-                    verticesData.push(0);//index2
-                    verticesData.push(0);//index3
-                    verticesData.push(0);//widget0;
-                    verticesData.push(0);//widget1
-                    verticesData.push(0);//widget2
-                    verticesData.push(0);//widget3
+                    if (_data.vec8widget != null)
+                    {
+                        var i0 = _data.vec8widget[i * 8 + 0];
+                        var w0 = _data.vec8widget[i * 8 + 4];
+                        console.warn("bw=" + i0 + "=" + w0);
+                        verticesData.push(_data.vec8widget[i * 8 + 0]);//index0;
+                        verticesData.push(_data.vec8widget[i * 8 + 1]);//index1
+                        verticesData.push(_data.vec8widget[i * 8 + 2]);//index2
+                        verticesData.push(_data.vec8widget[i * 8 + 3]);//index3
+                        verticesData.push(_data.vec8widget[i * 8 + 4]);//widget0;
+                        verticesData.push(_data.vec8widget[i * 8 + 5]);//widget1
+                        verticesData.push(_data.vec8widget[i * 8 + 6]);//widget2
+                        verticesData.push(_data.vec8widget[i * 8 + 7]);//widget3
+                        
+                    }
+                    else
+                    {
+                        verticesData.push(0);//index0;
+                        verticesData.push(0);//index1
+                        verticesData.push(0);//index2
+                        verticesData.push(0);//index3
+                        verticesData.push(0);//widget0;
+                        verticesData.push(0);//widget1
+                        verticesData.push(0);//widget2
+                        verticesData.push(0);//widget3
+
+                    }
                 }
             }
 
@@ -325,8 +350,8 @@ namespace FreeNode.ForEgret3D
         _parseSkinnedMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
             console.log("set _parseSkinnedMeshRenderer");
-            //node.geometry = new egret3d.SkinGeometry();
-            var geom = <egret3d.SubGeometry>node.geometry;
+            node.geometry = new egret3d.SkinGeometry();
+            var geom = <egret3d.SkinGeometry>node.geometry;
             var meshname = <string>json["mesh"];
             //var mesh = parent;
 
@@ -336,36 +361,37 @@ namespace FreeNode.ForEgret3D
             //    new BABYLON.VertexData();
             var verticesData: number[] = [];
             //bdata.positions = [];//填充位置数据
-            this.__FillGeomVertex(verticesData, _data, false);
+            this.__FillGeomVertex(verticesData, _data, true);
 
             //bdata.indices = [];//填充索引数据
             var indexData: number[] = [];
             this.__FillGeomIndex(indexData, _data);
+                        
+            //geom.setGeomtryData(indexData, verticesData);
 
             //geom.numItems = geom.indexData.length;
-            //var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
-            //this.__FillSkeleton(_initskeleton, _data);
-            //geom.setGeomtryData(indexData, verticesData, _initskeleton);
-            geom.setGeomtryData(indexData, verticesData);
+            var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
+            this.__FillSkeleton(_initskeleton, _data);
+            geom.setGeomtryData(indexData, verticesData, _initskeleton);
 
             geom.buildGeomtry();
             geom.buildBoundBox();
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
-            //{
-            //    //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
-            //    node.animation = new egret3d.SkeletonAnimation(_initskeleton);
-            //    var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
-            //    var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
-            //    clip.frameCount = 1;
-            //    var pose1 = new egret3d.Skeleton(_initskeleton);
+            {
+                //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
+                node.animation = new egret3d.SkeletonAnimation(_initskeleton);
+                //var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
+                //var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
+                //clip.frameCount = 1;
+                //var pose1 = new egret3d.Skeleton(_initskeleton);
 
-            //    clip.poseArray = [pose1];
-            //    clip.currentFrameIndex = 0;
-            //    clip.fillFrame(_initskeleton);
+                //clip.poseArray = [pose1];
+                ////clip.currentFrameIndex = 0;
+                ////clip.fillFrame(_initskeleton);
 
-            //    skani.addSkeletonAnimationClip(clip);
-            //    skani.play("p1");
-            //}
+                //skani.addSkeletonAnimationClip(clip);
+                //skani.play("p1");
+            }
             //end mesh
 
             node.material = new egret3d.TextureMaterial();

@@ -431,7 +431,7 @@ namespace FreeNode
                 else if (tag == 16)//tpose
                 {
                     var tposelen = read.readUInt8();
-                    meshdata.vec10tpose = new Float32Array(tposelen * 2);
+                    meshdata.vec10tpose = new Float32Array(tposelen * 10);
                     for (var i = 0; i < tposelen; i++)
                     {
                         meshdata.vec10tpose[i * 10 + 0] = read.readSingle();//posx;
@@ -451,14 +451,14 @@ namespace FreeNode
                     meshdata.vec8widget = new Float32Array(vcount * 8);
                     for (var i = 0; i < vcount; i++)
                     {
-                        meshdata.vec10tpose[i * 8 + 0] = read.readUInt32();//index0;
-                        meshdata.vec10tpose[i * 8 + 1] = read.readUInt32();//index1;
-                        meshdata.vec10tpose[i * 8 + 2] = read.readUInt32();//index2;
-                        meshdata.vec10tpose[i * 8 + 3] = read.readUInt32();//index3;
-                        meshdata.vec10tpose[i * 8 + 4] = read.readSingle();//widget0;
-                        meshdata.vec10tpose[i * 8 + 5] = read.readSingle();//widget1;
-                        meshdata.vec10tpose[i * 8 + 6] = read.readSingle();//widget2;
-                        meshdata.vec10tpose[i * 8 + 7] = read.readSingle();//widget3;
+                        meshdata.vec8widget[i * 8 + 0] = read.readUInt32();//index0;
+                        meshdata.vec8widget[i * 8 + 1] = read.readUInt32();//index1;
+                        meshdata.vec8widget[i * 8 + 2] = read.readUInt32();//index2;
+                        meshdata.vec8widget[i * 8 + 3] = read.readUInt32();//index3;
+                        meshdata.vec8widget[i * 8 + 4] = read.readSingle();//widget0;
+                        meshdata.vec8widget[i * 8 + 5] = read.readSingle();//widget1;
+                        meshdata.vec8widget[i * 8 + 6] = read.readSingle();//widget2;
+                        meshdata.vec8widget[i * 8 + 7] = read.readSingle();//widget3;
                     }
                 }
                 else

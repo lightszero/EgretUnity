@@ -262,7 +262,7 @@ public class BitHelper
         }
         if (mesh.boneWeights != null && mesh.boneWeights.Length != 0)
         {
-            s.WriteByte(17);//17 bindposes
+            s.WriteByte(17);//17 boneweights
             for (int i = 0; i < vc; i++)
             {
                 s.Write(BitConverter.GetBytes(mesh.boneWeights[i].boneIndex0), 0, 4);
