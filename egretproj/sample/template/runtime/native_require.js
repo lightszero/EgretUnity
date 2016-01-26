@@ -10,6 +10,7 @@ var game_file_list = [
 	"bin-debug/egretunity/freenode_parser_egret.js",
 	"bin-debug/Main.js",
 	"bin-debug/SampleScene.js",
+	"bin-debug/Sample_CreateSky.js",
 	//----auto game_file_list end----
 ];
 

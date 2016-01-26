@@ -7,7 +7,7 @@ class Main extends egret.DisplayObjectContainer
     public constructor()
     {
         super();
-
+        //new Sample_CreateSky();
         this.samepleScene = new SampleScene();
         var _viewPort = new egret3d.Rectangle(0, 0, 800, 600);
 

@@ -155,12 +155,17 @@ namespace FreeNode.ForEgret3D
                 joint.translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
                 joint.scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
                 joint.orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
+                joint.setLocalTransform(joint.orientation, joint.scale, joint.translation);
+                joint.inverseBindPose = new egret3d.Matrix4_4();
+                joint.inverseBindPose.copyFrom(joint.localMatrix);
+                joint.inverseBindPose.invert();//TPose数据被隐含在一个反转绑定矩阵里
+
+                //joint.setInverseBindPose(joint.translation, joint.orientation.toEulerAngles(), joint.scale);
 
                 //joint.translation = new egret3d.Vector3D(0, 0, 0);
-                //joint.scale = new egret3d.Vector3D(2, 2, 2);
-                //joint.orientation = new egret3d.Quaternion(0, 0.3, 0, 1);
-                joint.setLocalTransform(joint.orientation, joint.scale, joint.translation);
-                joint.setInverseBindPose(joint.translation, joint.orientation.toEulerAngles(), joint.scale);
+                //joint.scale = new egret3d.Vector3D(1, 1, 1);
+                //joint.orientation = new egret3d.Quaternion(0, 0, 0, 1);
+                //joint.setLocalTransform(joint.orientation, joint.scale, joint.translation);
 
                 skeleton.joints.push(joint);
             }
@@ -177,9 +182,9 @@ namespace FreeNode.ForEgret3D
                 var z = _data.vec3positions[i * 3 + 2];
 
                 //egret3d 计算系统有坑，先乘以2
-                verticesData.push(x * 2);
-                verticesData.push(y * 2);
-                verticesData.push(z * 2);
+                verticesData.push(x);
+                verticesData.push(y);
+                verticesData.push(z);
                 if (_data.vec3normals != null)
                 {
                     var nx = _data.vec3normals[i * 3 + 0];
@@ -256,9 +261,9 @@ namespace FreeNode.ForEgret3D
                 {
                     if (_data.vec8widget != null)
                     {
-                        var i0 = _data.vec8widget[i * 8 + 0];
-                        var w0 = _data.vec8widget[i * 8 + 4];
-                        console.warn("bw=" + i0 + "=" + w0);
+                        //var i0 = _data.vec8widget[i * 8 + 0];
+                        //var w0 = _data.vec8widget[i * 8 + 4];
+                        //console.warn("bw=" + i0 + "=" + w0);
                         verticesData.push(_data.vec8widget[i * 8 + 0]);//index0;
                         verticesData.push(_data.vec8widget[i * 8 + 1]);//index1
                         verticesData.push(_data.vec8widget[i * 8 + 2]);//index2
@@ -391,8 +396,8 @@ namespace FreeNode.ForEgret3D
                 pose1.numJoint = _initskeleton.numJoint;
                 for (var i = 0; i < _initskeleton.numJoint; i++)
                 {
-                    var joint = _initskeleton.joints[i].clone();
-                    joint.setLocalTransform(new egret3d.Quaternion(0, 0, 0, 1), new egret3d.Vector3D(1, 1, 1), new egret3d.Vector3D(0, 0, 0));
+                    var joint = new egret3d.Joint(_initskeleton.joints[i].name);
+                    joint.setLocalTransform(_initskeleton.joints[i].orientation, new egret3d.Vector3D(1, 1, 1), _initskeleton.joints[i].translation);
                     pose1.joints.push(joint);
                 }
                 //pose1.reset();

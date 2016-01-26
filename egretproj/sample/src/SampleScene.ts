@@ -12,7 +12,6 @@ class SampleScene
     //初始化
     public Init(_viewPort: egret3d.Rectangle): void
     {
-
         //创建View3D对象;
         this._view3D = new egret3d.View3D(_viewPort);
 
@@ -70,7 +69,7 @@ class SampleScene
 
         this.onUpdate();
 
-        this._view3D.renden(this._time, this._delay);
+        this._view3D.update(this._time, this._delay);
 
         requestAnimationFrame(() => this._Update());
     }
@@ -81,9 +80,9 @@ class SampleScene
     {
         //创建像机控制器;
         this._cameraCtl = new egret3d.LookAtController(this._view3D.camera3D, new egret3d.Object3D());
-
+        this._cameraCtl.lookAtPosition = new egret3d.Vector3D(0, 0.5, 0);
         //设置像机视野距离;
-        this._cameraCtl.setEyesLength(10);
+        this._cameraCtl.setEyesLength(5);
         //加载场景文件，此处会自动加载所有相关资源到streambox中
         var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/diaochan.indexlist.txt", () =>
         {
@@ -97,7 +96,7 @@ class SampleScene
         }
             , false);//在egret环境，这里用false;
 
-        egretUnity.InitDebuger();
+        //egretUnity.InitDebuger();
     }
     protected onUpdate(): void
     {
