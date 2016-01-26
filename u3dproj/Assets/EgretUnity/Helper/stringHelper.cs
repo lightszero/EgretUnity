@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-class StringHelper
+public class StringHelper
 {
     public static string ToString(Color c)
     {

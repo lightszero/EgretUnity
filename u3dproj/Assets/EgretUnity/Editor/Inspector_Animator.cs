@@ -11,7 +11,6 @@ public class Animator_Inspector : Editor
 {
     //
     Dictionary<string, float> anipos = new Dictionary<string, float>();
-    AnimationClip playclip;
     DateTime last = DateTime.Now;
     float timer = 0;
     public override void OnInspectorGUI()
@@ -44,22 +43,10 @@ public class Animator_Inspector : Editor
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(c.name + "(" + c.length * c.frameRate + ")" + (c.isLooping ? "loop" : ""));
 
-                    if (playclip == c)
+
+                    if(GUILayout.Button("Create FBAni", GUILayout.Width(150)))
                     {
-                        if (GUILayout.Button("Stop", GUILayout.Width(150)))
-                        {
-                            playclip = null;
-                        }
-                    }
-                    else
-                    {
-                        if (GUILayout.Button("Play", GUILayout.Width(150)))
-                        {
-                            playclip = c;
-                            ani.Play(c.name, 0, 0);
-                            timer = 0;
-                            //    //CloneAni(c, c.frameRate);
-                        }
+                        CloneAni(c, c.frameRate);
                     }
                     GUILayout.EndHorizontal();
                     if (anipos.ContainsKey(c.name) == false)
@@ -76,114 +63,99 @@ public class Animator_Inspector : Editor
                         ani.updateMode = AnimatorUpdateMode.UnscaledTime;
                         ani.Update(0);// 0.001f);
 
-                        playclip = null;
                     }
                 }
 
             }
         }
-        if (playclip!=null)
-        {
-            DateTime _now = DateTime.Now;
-            float delta = (float)(_now - last).TotalSeconds;
-            last = _now;
-            
-            ani.Update(delta);
-            timer += delta;
-            if (playclip.isLooping==false&& timer >= playclip.length)
-            {
-                playclip = null;
-                timer = 0;
-            }
-            Repaint();
-        }
+
     }
-    //void CloneAni(AnimationClip clip, float fps)
-    //{
+    void CloneAni(AnimationClip clip, float fps)
+    {
 
-    //    var ani = target as Animator;
+        var ani = target as Animator;
 
-    //    //创建CleanData.Ani
-    //    FB.PosePlus.AniClip _clip = ScriptableObject.CreateInstance<FB.PosePlus.AniClip>();
-    //    _clip.boneinfo = new List<string>();//也增加了每个动画中的boneinfo信息.
+        //创建CleanData.Ani
+        FB.PosePlus.AniClip _clip = ScriptableObject.CreateInstance<FB.PosePlus.AniClip>();
+        _clip.boneinfo = new List<string>();//也增加了每个动画中的boneinfo信息.
 
-    //    //这里重新检查动画曲线，找出动画中涉及的Transform部分，更精确
-    //    List<Transform> cdpath = new List<Transform>();
-    //    AnimationClipCurveData[] curveDatas = AnimationUtility.GetAllCurves(clip, true);
-    //    foreach (var dd in curveDatas)
-    //    {
-    //        Transform tran = ani.transform.Find(dd.path);
-    //        if (cdpath.Contains(tran) == false)
-    //        {
-    //            _clip.boneinfo.Add(dd.path);
-    //            cdpath.Add(tran);
-    //        }
-    //    }
-    //    Debug.LogWarning("curve got path =" + cdpath.Count);
+        //这里重新检查动画曲线，找出动画中涉及的Transform部分，更精确
+        List<Transform> cdpath = new List<Transform>();
+        AnimationClipCurveData[] curveDatas = AnimationUtility.GetAllCurves(clip, true);
+        foreach (var dd in curveDatas)
+        {
+            Transform tran = ani.transform.Find(dd.path);
+            if (cdpath.Contains(tran) == false)
+            {
+                _clip.boneinfo.Add(dd.path);
+                cdpath.Add(tran);
+            }
+        }
+        Debug.LogWarning("curve got path =" + cdpath.Count);
 
 
-    //    string path = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(clip.GetInstanceID()));
-    //    _clip.name = clip.name;
-    //    _clip.frames = new List<FB.PosePlus.Frame>();
-    //    _clip.fps = fps;
-    //    _clip.loop = clip.isLooping;
-    //    float flen = (clip.length * fps);
-    //    int framecount = (int)flen;
-    //    if (flen - framecount > 0.0001) framecount++;
-    //    //if (framecount < 1) framecount = 1;
+        string path = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(clip.GetInstanceID()));
+        _clip.name = clip.name;
+        _clip.frames = new List<FB.PosePlus.Frame>();
+        _clip.fps = fps;
+        _clip.loop = clip.isLooping;
+        float flen = (clip.length * fps);
+        int framecount = (int)flen;
+        if (flen - framecount > 0.0001) framecount++;
+        //if (framecount < 1) framecount = 1;
 
-    //    framecount += 1;
-    //    FB.PosePlus.Frame last = null;
+        framecount += 1;
+        FB.PosePlus.Frame last = null;
 
-    //    //ani.StartPlayback();
-    //    //逐帧复制
-    //    //ani.Play(_clip.name, 0, 0);
-    //    for (int i = 0; i < framecount; i++)
-    //    {
-    //        ani.Play(_clip.name, 0, (i * 1.0f / fps) / clip.length);
-    //        ani.Update(0);
+        //ani.StartPlayback();
+        //逐帧复制
+        //ani.Play(_clip.name, 0, 0);
+        for (int i = 0; i < framecount; i++)
+        {
+            ani.Play(_clip.name, 0, (i * 1.0f / fps) / clip.length);
+            ani.Update(0);
 
-    //        last = new FB.PosePlus.Frame(last, i, cdpath);
-    //        _clip.frames.Add(last);
-    //    }
-    //    if (_clip.loop)
-    //    {
-    //        _clip.frames[0].LinkLoop(last);
-    //    }
-    //    Debug.Log("FrameCount." + framecount);
+            last = new FB.PosePlus.Frame(last, i, cdpath);
+            _clip.frames.Add(last);
+        }
+        if (_clip.loop)
+        {
+            _clip.frames[0].LinkLoop(last);
+        }
+        Debug.Log("FrameCount." + framecount);
 
-    //    FB.PosePlus.AniPlayer con = ani.GetComponent<FB.PosePlus.AniPlayer>();
+        FB.PosePlus.AniPlayer con = ani.GetComponent<FB.PosePlus.AniPlayer>();
 
-    //    List<FB.PosePlus.AniClip> clips = null;
-    //    if (con.clips != null)
-    //    {
-    //        clips = new List<FB.PosePlus.AniClip>(con.clips);
-    //    }
-    //    else
-    //    {
-    //        clips = new List<FB.PosePlus.AniClip>();
-    //    }
-    //    foreach (var c in clips)
-    //    {
-    //        if (c.name == _clip.name + ".FBAni")
-    //        {
-    //            clips.Remove(c);
-    //            break;
-    //        }
-    //    }
+        List<FB.PosePlus.AniClip> clips = null;
+        if (con.clips != null)
+        {
+            clips = new List<FB.PosePlus.AniClip>(con.clips);
+        }
+        else
+        {
+            clips = new List<FB.PosePlus.AniClip>();
+        }
+        foreach (var c in clips)
+        {
+            if (c.name == _clip.name + ".FBAni")
+            {
+                clips.Remove(c);
+                break;
+            }
+        }
 
-    //    //ani.StopPlayback();
-    //    string outpath = path + "/" + clip.name + ".FBAni.asset";
-    //    AssetDatabase.CreateAsset(_clip, outpath);
-    //    var src = AssetDatabase.LoadAssetAtPath(outpath, typeof(FB.PosePlus.AniClip)) as FB.PosePlus.AniClip;
+        //ani.StopPlayback();
+        string outpath = path + "/" + clip.name + ".FBAni.asset";
+        AssetDatabase.CreateAsset(_clip, outpath);
+        var src = AssetDatabase.LoadAssetAtPath(outpath, typeof(FB.PosePlus.AniClip)) as FB.PosePlus.AniClip;
 
-    //    //设置clip
+        //设置clip
 
-    //    //FB.CleanData.AniController con = ani.GetComponent<FB.CleanData.AniController>();
+        //FB.CleanData.AniController con = ani.GetComponent<FB.CleanData.AniController>();
 
-    //    clips.Add(src);
-    //    con.clips = clips;
-    //}
+        clips.Add(src);
+        con.clips = clips;
+    }
     //从一个Animator中获取所有的Animation
     public static void FindAllAniInControl(UnityEditor.Animations.AnimatorController control, List<AnimationClip> list)
     {

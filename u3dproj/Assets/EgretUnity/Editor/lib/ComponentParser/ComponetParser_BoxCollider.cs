@@ -8,6 +8,7 @@ namespace nodeParser
 {
     class ComponetParser_BoxCollider : IComponetParser
     {
+
         public Type comptype
         {
             get
