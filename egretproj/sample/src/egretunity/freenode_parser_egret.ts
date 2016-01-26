@@ -151,10 +151,14 @@ namespace FreeNode.ForEgret3D
             for (var i = 0; i < _data.vec10tpose.length / 10; i++)
             {
                 var joint: egret3d.Joint = new egret3d.Joint("sk" + i);
-                
+
                 joint.translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
                 joint.scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
                 joint.orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
+
+                //joint.translation = new egret3d.Vector3D(0, 0, 0);
+                //joint.scale = new egret3d.Vector3D(2, 2, 2);
+                //joint.orientation = new egret3d.Quaternion(0, 0.3, 0, 1);
                 joint.setLocalTransform(joint.orientation, joint.scale, joint.translation);
                 joint.setInverseBindPose(joint.translation, joint.orientation.toEulerAngles(), joint.scale);
 
@@ -380,17 +384,24 @@ namespace FreeNode.ForEgret3D
             {
                 //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
                 node.animation = new egret3d.SkeletonAnimation(_initskeleton);
-                //var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
-                //var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
-                //clip.frameCount = 1;
-                //var pose1 = new egret3d.Skeleton(_initskeleton);
+                var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
+                var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
+                clip.frameCount = 1;
+                var pose1 = new egret3d.Skeleton(_initskeleton);
+                pose1.numJoint = _initskeleton.numJoint;
+                for (var i = 0; i < _initskeleton.numJoint; i++)
+                {
+                    var joint = _initskeleton.joints[i].clone();
+                    joint.setLocalTransform(new egret3d.Quaternion(0, 0, 0, 1), new egret3d.Vector3D(1, 1, 1), new egret3d.Vector3D(0, 0, 0));
+                    pose1.joints.push(joint);
+                }
+                //pose1.reset();
+                clip.poseArray = [pose1];
+                //clip.currentFrameIndex = 0;
+                //clip.fillFrame(_initskeleton);
 
-                //clip.poseArray = [pose1];
-                ////clip.currentFrameIndex = 0;
-                ////clip.fillFrame(_initskeleton);
-
-                //skani.addSkeletonAnimationClip(clip);
-                //skani.play("p1");
+                skani.addSkeletonAnimationClip(clip);
+                skani.play("p1");
             }
             //end mesh
 
