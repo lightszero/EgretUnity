@@ -84,7 +84,7 @@ public class BitHelper
         //去掉旋转和偏移
         m.m03 = 0; m.m13 = 0; m.m23 = 0;
         Matrix4x4 im = Matrix4x4.TRS(Vector3.zero, quat, Vector3.one);
-        m*=im.inverse;
+        m *= im.inverse;
         //scale
         scale = new Vector3(m.m00, m.m11, m.m22);
 
@@ -472,4 +472,134 @@ public class BitHelper
         return m;
     }
 
+    public static void WriteAniClip(FB.PosePlus.AniClip clip, System.IO.Stream ms)
+    {
+        //name
+        var nameb = System.Text.Encoding.UTF8.GetBytes(clip.name);
+        ms.WriteByte((byte)nameb.Length);
+        ms.Write(nameb, 0, nameb.Length);
+        //fps
+        byte[] fpsb = BitConverter.GetBytes(clip.fps);
+        ms.Write(fpsb, 0, 4);
+        //loop
+        ms.WriteByte((byte)(clip.loop ? 1 : 0));
+        {
+            //boneinfo
+            int c = clip.boneinfo.Count;
+            byte[] cliplenb = BitConverter.GetBytes(c);
+            ms.Write(cliplenb, 0, 4);
+            for (int i = 0; i < c; i++)
+            {
+                byte[] bnameb = System.Text.Encoding.UTF8.GetBytes(clip.boneinfo[i]);
+                ms.WriteByte((byte)bnameb.Length);
+                ms.Write(bnameb, 0, bnameb.Length);
+            }
+        }
+        {
+            //subclips
+            int c = clip.subclips.Count;
+            byte[] cliplenb = BitConverter.GetBytes(c);
+            ms.Write(cliplenb, 0, 4);
+            for (int i = 0; i < c; i++)
+            {
+                byte[] bnameb = System.Text.Encoding.UTF8.GetBytes(clip.subclips[i].name);
+                ms.WriteByte((byte)bnameb.Length);
+                ms.Write(bnameb, 0, bnameb.Length);
+
+                ms.WriteByte((byte)(clip.subclips[i].loop ? 1 : 0));
+                byte[] sb = BitConverter.GetBytes(clip.subclips[i].startframe);
+                byte[] eb = BitConverter.GetBytes(clip.subclips[i].endframe);
+            }
+        }
+
+        {//frame
+            int c = clip.frames.Count;
+            byte[] cliplenb = BitConverter.GetBytes(c);
+            ms.Write(cliplenb, 0, 4);
+            for (int i = 0; i < c; i++)
+            {
+                byte[] fidb = BitConverter.GetBytes(clip.frames[i].fid);
+                ms.Write(fidb, 0, 4);
+                ms.WriteByte((byte)(clip.frames[i].key ? 1 : 0));
+
+                for (int ib = 0; ib < clip.boneinfo.Count; ib++)
+                {
+                    clip.frames[i].bonesinfo[ib].Save(ms,
+                        i > 0 ? clip.frames[i - 1].bonesinfo[ib] : null);
+                }
+            }
+        }
+    }
+
+    public static FB.PosePlus.AniClip ReadAniClip(System.IO.Stream s)
+    {
+        var buf4 = new byte[4];
+
+        var clip = new FB.PosePlus.AniClip();
+        //name
+        int slen = s.ReadByte();
+        byte[] buf = new byte[slen];
+        s.Read(buf, 0, slen);
+        clip.name = System.Text.Encoding.UTF8.GetString(buf);
+        //fps
+        s.Read(buf4, 0, 4);
+        clip.fps = BitConverter.ToSingle(buf4, 0);
+        //loop
+        clip.loop = s.ReadByte() > 0;
+        {
+            //boneinfo
+            s.Read(buf4, 0, 4);
+            int bcount = BitConverter.ToInt32(buf4, 0);
+
+            for (int i = 0; i < bcount; i++)
+            {
+                slen = s.ReadByte();
+                buf = new byte[slen];
+                s.Read(buf, 0, slen);
+                string bone = System.Text.Encoding.UTF8.GetString(buf);
+                clip.boneinfo.Add(bone);
+            }
+        }
+        {
+            //subclips
+            s.Read(buf4, 0, 4);
+            int scount = BitConverter.ToInt32(buf4, 0);
+            for (int i = 0; i < scount; i++)
+            {
+                FB.PosePlus.SubClip sc = new FB.PosePlus.SubClip();
+                slen = s.ReadByte();
+                buf = new byte[slen];
+                s.Read(buf, 0, slen);
+                sc.name = System.Text.Encoding.UTF8.GetString(buf);
+                sc.loop = s.ReadByte() > 0;
+                s.Read(buf4, 0, 4);
+                sc.startframe = BitConverter.ToUInt32(buf4,0);
+                s.Read(buf4, 0, 4);
+                sc.endframe = BitConverter.ToUInt32(buf4,0);
+
+                clip.subclips.Add(sc);
+            }
+        }
+        {//frame
+            s.Read(buf4, 0, 4);
+            int fcount = BitConverter.ToInt32(buf4, 0);
+
+            for (int i = 0; i < fcount; i++)
+            {
+                FB.PosePlus.Frame f = new FB.PosePlus.Frame();
+                s.Read(buf4, 0, 4);
+                f.fid = BitConverter.ToInt32(buf4, 0);
+                f.key = s.ReadByte() > 0;
+                clip.frames.Add(f);
+
+                for (int ib = 0; ib < clip.boneinfo.Count; ib++)
+                {
+                    clip.frames[i].bonesinfo.Add(new FB.PosePlus.PoseBoneMatrix());
+                    clip.frames[i].bonesinfo[ib].Load(s,
+                        i > 0 ? clip.frames[i - 1].bonesinfo[ib] : null);
+                }
+            }
+        }
+        return clip;
+    }
 }

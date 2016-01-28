@@ -170,44 +170,44 @@ namespace FB.PosePlus
                 stream.Write(buf, 0, 12);
             }
         }
-        //public void Load(System.IO.Stream stream, PoseBoneMatrix last)
-        //{
-        //    byte[] btag = new byte[2];
-        //    stream.Read(btag, 0, 2);
-        //    this.tag = (PoseBoneMatrix.changetag)btag[0];
-        //    PoseBoneMatrix.changetag savetag = (PoseBoneMatrix.changetag)btag[1];
-        //    //Debug.LogWarning("savetag=" + this.tag + "|" + savetag); 
-        //    if ((savetag & PoseBoneMatrix.changetag.Rotate) > 0)
-        //    {
-        //        byte[] buf = new byte[16];
-        //        stream.Read(buf, 0, 16);
-        //        r = BitHelper.ToQuaternion(buf, 0);
-        //    }
-        //    else
-        //    {
-        //        r = last.r;
-        //    }
-        //    if ((savetag & PoseBoneMatrix.changetag.Trans) > 0)
-        //    {
-        //        byte[] buf = new byte[12];
-        //        stream.Read(buf, 0, 12);
-        //        t = BitHelper.ToVector3(buf, 0);
-        //    }
-        //    else
-        //    {
-        //        t = last.t;
-        //    }
-        //    if ((savetag & PoseBoneMatrix.changetag.Scale) > 0)
-        //    {
-        //        byte[] buf = new byte[12];
-        //        stream.Read(buf, 0, 12);
-        //        s = BitHelper.ToVector3(buf, 0);
-        //    }
-        //    else
-        //    {
-        //        s = last.s;
-        //    }
-        //}
+        public void Load(System.IO.Stream stream, PoseBoneMatrix last)
+        {
+            byte[] btag = new byte[2];
+            stream.Read(btag, 0, 2);
+            this.tag = (PoseBoneMatrix.changetag)btag[0];
+            PoseBoneMatrix.changetag savetag = (PoseBoneMatrix.changetag)btag[1];
+            //Debug.LogWarning("savetag=" + this.tag + "|" + savetag); 
+            if (last==null||(savetag & PoseBoneMatrix.changetag.Rotate) > 0)
+            {
+                byte[] buf = new byte[16];
+                stream.Read(buf, 0, 16);
+                r = BitHelper.ToQuaternion(buf, 0);
+            }
+            else
+            {
+                r = last.r;
+            }
+            if (last == null || (savetag & PoseBoneMatrix.changetag.Trans) > 0)
+            {
+                byte[] buf = new byte[12];
+                stream.Read(buf, 0, 12);
+                t = BitHelper.ToVector3(buf, 0);
+            }
+            else
+            {
+                t = last.t;
+            }
+            if (last == null || (savetag & PoseBoneMatrix.changetag.Scale) > 0)
+            {
+                byte[] buf = new byte[12];
+                stream.Read(buf, 0, 12);
+                s = BitHelper.ToVector3(buf, 0);
+            }
+            else
+            {
+                s = last.s;
+            }
+        }
 
         public object Clone()
         {
