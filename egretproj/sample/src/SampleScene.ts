@@ -86,7 +86,7 @@ class SampleScene
         //加载场景文件，此处会自动加载所有相关资源到streambox中
         var streambox = FreeNode.StreamBox.CreateFromIndexFile("resource/diaochan.indexlist.txt", () =>
         {
-            console.warn("index loaded.");
+            //console.warn("index loaded.");
             
             //load Scene;
             //处理模块

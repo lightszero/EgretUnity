@@ -81,17 +81,22 @@ namespace FreeNode.ForEgret3D
             {
                 this._parseTransform(json, box, parent);
             }
-            if (json["type"] == "meshfilter")
+            else if (json["type"] == "meshfilter")
             {
                 this._parseMeshFilter(json, box, parent);
             }
-            if (json["type"] == "meshrenderer")
+            else if (json["type"] == "meshrenderer")
             {
                 this._parseMeshRenderer(json, box, parent);
             }
-            if (json["type"] == "skinnedmeshrenderer")
+            else if (json["type"] == "skinnedmeshrenderer")
             {
                 this._parseSkinnedMeshRenderer(json, box, parent);
+            }
+            else
+            {
+                console.warn("not parse com:" + json["type"]);
+                return;
             }
             console.log("parse com:" + json["type"]);
         }

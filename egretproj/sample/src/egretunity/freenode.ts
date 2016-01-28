@@ -550,7 +550,70 @@ namespace FreeNode
         y: number;
         z: number;
     }
+    export class Quaternion
+    {
+        constructor(_x: number, _y: number, _z: number, _w: number)
+        {
+            this.x = _x;
+            this.y = _y;
+            this.z = _z;
+            this.w = _w;
+        }
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    }
+    export class SubClip
+    {
+        name: string = "noname";
+        loop: boolean;
 
+        startframe: number;
+        endframe: number;
+    }
+    export enum changetag
+    {
+        NoChange = 0,
+        Trans = 1,
+        Rotate = 2,
+        Scale = 4,
+        TransRotate = 3,
+        TransScale = 5,
+        RotateScale = 6,
+        All = 7,
+    }
+    export class PoseBoneMatrix
+    {
+        t: Vector3;
+        s: Vector3;
+        r: Quaternion;
+        tag: changetag;
+        Clone(): PoseBoneMatrix
+        {
+            var p = new PoseBoneMatrix();
+            p.t = this.t;
+            p.s = this.s;
+            p.r = this.r;
+            p.tag = this.tag;
+            return p;
+        }
+    }
+    export class Frame
+    {
+        fid: number;
+        key: boolean;
+        bonedata: PoseBoneMatrix[];
+    }
+    export class AniClip
+    {
+        name: string;
+        fps: number;
+        loop: boolean;
+        boneinfo: string[];
+        subclips: SubClip[];
+        frames: Frame[];
+    }
     export class SceneParser
     {
         parser: IParser;
