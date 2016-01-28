@@ -9,7 +9,7 @@ namespace FB.PosePlus
     //新的动画控制器，相比封闭的animator，建立一个更开放自由的模式
     public class AniPlayer : MonoBehaviour
     {
-        public int tagid;
+        //public int tagid;
         void Start()
         {
             /*SetExtPlayer(mEffectMgr);//TODO:XiaoFan 测试用*/

@@ -106,40 +106,40 @@ namespace FB.PosePlus
         {
             return frames[frame];
         }
-        public void CalcLerpFrameOne(int frame)
-        {
-            //搜索开始与结束帧
-            if (frames[frame].key) return;
-            if (frame <= 0 || frame >= frames.Count - 1) return;
-            int ibegin = frame;
-            for (; ibegin >= 0; ibegin--)
-            {
-                if (frames[ibegin].key)
-                {
-                    break;
-                }
-            }
-            if (ibegin == frame) return;
-            int iend = frame;
-            for (; iend < frames.Count; iend++)
-            {
-                if (frames[iend].key)
-                {
-                    break;
-                }
-            }
-            if (iend == frame) return;
+        //public void CalcLerpFrameOne(int frame)
+        //{
+        //    //搜索开始与结束帧
+        //    if (frames[frame].key) return;
+        //    if (frame <= 0 || frame >= frames.Count - 1) return;
+        //    int ibegin = frame;
+        //    for (; ibegin >= 0; ibegin--)
+        //    {
+        //        if (frames[ibegin].key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (ibegin == frame) return;
+        //    int iend = frame;
+        //    for (; iend < frames.Count; iend++)
+        //    {
+        //        if (frames[iend].key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (iend == frame) return;
 
-            int i = frame;
-            {
-                //float d1 = (i - ibegin);
-                //float d2 = (iend - i);
-                float lerp = frames[i].lerp;
-                frames[i] = Frame.Lerp(frames[ibegin], frames[iend], lerp);
-                frames[i].lerp = lerp;
-                frames[i].fid = i;
-            }
-        }
+        //    int i = frame;
+        //    {
+        //        //float d1 = (i - ibegin);
+        //        //float d2 = (iend - i);
+        //        float lerp = frames[i].lerp;
+        //        frames[i] = Frame.Lerp(frames[ibegin], frames[iend], lerp);
+        //        frames[i].lerp = lerp;
+        //        frames[i].fid = i;
+        //    }
+        //}
         public void ResetLerpFrameSegment(int frame)
         {
             //搜索开始与结束帧
@@ -170,7 +170,7 @@ namespace FB.PosePlus
                 float d2 = (iend - i);
                 float lerp = d1 / (d1 + d2);
                 frames[i] = Frame.Lerp(frames[ibegin], frames[iend], lerp);
-                frames[i].lerp = lerp;
+                //frames[i].lerp = lerp;
                 frames[i].fid = i;
             }
         }
@@ -312,7 +312,7 @@ namespace FB.PosePlus
                                 float d2 = (iend - i);
                                 float lerp = d1 / (d1 + d2);
                                 frames[i] = Frame.Lerp(frames[ibegin], frames[iend], lerp);
-                                frames[i].lerp = lerp;
+                                //frames[i].lerp = lerp;
                                 frames[i].fid = i;
                             }
                             break;

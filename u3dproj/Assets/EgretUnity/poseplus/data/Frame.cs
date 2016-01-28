@@ -74,12 +74,9 @@ namespace FB.PosePlus
 
         [SerializeField]
         public bool key;
-        [SerializeField]
-        public bool box_key;
-        [SerializeField]
-        public bool dot_key;
-        [SerializeField]
-        public float lerp;
+
+        //[SerializeField]
+        //public float lerp;
         public Frame()
         {
 

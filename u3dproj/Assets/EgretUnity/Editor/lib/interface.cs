@@ -29,10 +29,12 @@ namespace nodeParser
         string SaveMesh(Mesh mesh);
         string SaveMat(Material mat);
         string SaveTexture(Texture2D tex);
+        string SaveAniClip(FB.PosePlus.AniClip clip);
 
         Mesh GetMesh(string name);
         Material GetMat(string name);
         Texture2D GetTexture(string name);
+        FB.PosePlus.AniClip GetAniClip(string name);
     }
     public class DelayProcess
     {

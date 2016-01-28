@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using FB.PosePlus;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -28,6 +29,7 @@ namespace nodeParser
             RegComponentParser(new ComponetParser_MeshRenderer());
             RegComponentParser(new ComponetParser_BoxCollider());
             RegComponentParser(new ComponetParser_SkinnedMeshRenderer());
+            RegComponentParser(new ComponetParser_Aniplayer());
 
             matParsers = new Dictionary<string, MatParser>();
             //RegMatParser(new matparser_standard());
@@ -205,7 +207,7 @@ namespace nodeParser
             {
 
                 string type = c["type"].AsString();
-                this.componentParsers[type].ReadFromJson(resmgr, _obj, c,dp);
+                this.componentParsers[type].ReadFromJson(resmgr, _obj, c, dp);
             }
 
             //遍历填充树
@@ -470,6 +472,98 @@ namespace nodeParser
             loadtexcache[name] = tex;
 
             return tex;
+        }
+
+        public string SaveAniClip(AniClip clip)
+        {
+            int id = clip.GetInstanceID();
+            string name = null;
+            if (savecache.TryGetValue(id, out name))
+            {
+                return name;
+            }
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                //name
+                var nameb = System.Text.Encoding.UTF8.GetBytes(clip.name);
+                ms.WriteByte((byte)nameb.Length);
+                ms.Write(nameb, 0, nameb.Length);
+                //fps
+                byte[] fpsb = BitConverter.GetBytes(clip.fps);
+                ms.Write(fpsb, 0, 4);
+                //loop
+                ms.WriteByte((byte)(clip.loop ? 1 : 0));
+                {
+                    //boneinfo
+                    int c = clip.boneinfo.Count;
+                    byte[] cliplenb = BitConverter.GetBytes(c);
+                    ms.Write(cliplenb, 0, 4);
+                    for (int i = 0; i < c; i++)
+                    {
+                        byte[] bnameb = System.Text.Encoding.UTF8.GetBytes(clip.boneinfo[i]);
+                        ms.WriteByte((byte)bnameb.Length);
+                        ms.Write(bnameb, 0, bnameb.Length);
+                    }
+                }
+                {
+                    //subclips
+                    int c = clip.subclips.Count;
+                    byte[] cliplenb = BitConverter.GetBytes(c);
+                    ms.Write(cliplenb, 0, 4);
+                    for (int i = 0; i < c; i++)
+                    {
+                        byte[] bnameb = System.Text.Encoding.UTF8.GetBytes(clip.subclips[i].name);
+                        ms.WriteByte((byte)bnameb.Length);
+                        ms.Write(bnameb, 0, bnameb.Length);
+
+                        ms.WriteByte((byte)(clip.subclips[i].loop ? 1 : 0));
+                        byte[] sb = BitConverter.GetBytes(clip.subclips[i].startframe);
+                        byte[] eb = BitConverter.GetBytes(clip.subclips[i].endframe);
+                    }
+                }
+
+                {//frame
+                    int c = clip.frames.Count;
+                    byte[] cliplenb = BitConverter.GetBytes(c);
+                    ms.Write(cliplenb, 0, 4);
+                    for (int i = 0; i < c; i++)
+                    {
+                        byte[] fidb = BitConverter.GetBytes(clip.frames[i].fid);
+                        ms.Write(fidb, 0, 4);
+                        ms.WriteByte((byte)(clip.frames[i].key ? 1 : 0));
+
+                        for (int ib = 0; ib < clip.boneinfo.Count; ib++)
+                        {
+                            clip.frames[i].bonesinfo[ib].Save(ms,
+                                i > 0 ? clip.frames[i - 1].bonesinfo[ib] : null);
+                        }
+                    }
+                }
+                byte[] bs = ms.ToArray();
+                string sha1 = ResLibTool.ComputeHashString(bs);
+
+                name = sha1 + ".aniclip.bin";
+                bufs[name] = bs;
+            }
+
+            return name;
+        }
+        Dictionary<string, FB.PosePlus.AniClip> loadaniclipcache = new Dictionary<string, AniClip>();
+        public AniClip GetAniClip(string name)
+        {
+            FB.PosePlus.AniClip clip = null;
+            if (loadaniclipcache.TryGetValue(name, out clip))
+            {
+                return clip;
+            }
+
+            byte[] buf = bufs[name];
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream(buf))
+            {
+                clip = new AniClip();
+            }
+
+            return clip;
         }
     }
 }

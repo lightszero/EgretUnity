@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>WebPlayer:6</UnityBuildTarget>
     <UnityVersion>5.3.1p4</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -94,6 +96,7 @@
     <Compile Include="Assets\EgretUnity\Editor\Inspector_FBAni.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_BoxCollider.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshFilter.cs" />
+    <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Aniplayer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_SkinnedMeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Transform.cs" />
