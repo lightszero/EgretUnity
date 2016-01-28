@@ -19,15 +19,16 @@ public class Animator_Inspector : Editor
         base.OnInspectorGUI();
         if (Application.isPlaying) return;
 
-        EditorGUILayout.HelpBox("这里增加一个Inspector,用来检查动画", MessageType.Info);
+        
+        //EditorGUILayout.HelpBox("这里增加一个Inspector,用来检查动画", MessageType.Info);
         EditorGUILayout.HelpBox("你只需要把所有的动画拖入一个controller就行了，然后我们就会导出他", MessageType.Info);
-
         //GUILayout.Label("1:" + this.serializedObject);
         //GUILayout.Label("2:" + this.target);
         //return;
         var ani = target as Animator;
+        
         {
-
+            
             List<AnimationClip> clips = new List<AnimationClip>();
             //if (GUILayout.Button("Update Clips"))
             //{
@@ -35,6 +36,18 @@ public class Animator_Inspector : Editor
             if (cc != null)
             {
                 FindAllAniInControl(cc, clips);
+
+                if(ani.gameObject.GetComponent<FB.PosePlus.AniPlayer>()==null)
+                {
+                    if(GUILayout.Button("Create FBAni Component"))
+                    {
+                        ani.gameObject.AddComponent<FB.PosePlus.AniPlayer>();
+                        foreach(var c in clips)
+                        {
+                            CloneAni(c, c.frameRate);
+                        }
+                    }
+                }
                 GUILayout.Label("拥有动画:" + clips.Count);
                 //}
                 foreach (var c in clips)
@@ -81,7 +94,8 @@ public class Animator_Inspector : Editor
 
         //这里重新检查动画曲线，找出动画中涉及的Transform部分，更精确
         List<Transform> cdpath = new List<Transform>();
-        AnimationClipCurveData[] curveDatas = AnimationUtility.GetAllCurves(clip, true);
+        var curveDatas= AnimationUtility.GetCurveBindings(clip);
+        //AnimationClipCurveData[] curveDatas = AnimationUtility.GetAllCurves(clip, true);
         foreach (var dd in curveDatas)
         {
             Transform tran = ani.transform.Find(dd.path);

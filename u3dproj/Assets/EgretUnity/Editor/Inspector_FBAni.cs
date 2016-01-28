@@ -213,10 +213,10 @@ public class FBAni_Inspector : Editor
             GUILayout.EndHorizontal();
 
 
-            if (GUILayout.Button("匹配所有动画的骨骼"))
-            {
-                MatchBone();
-            }
+            //if (GUILayout.Button("匹配所有动画的骨骼"))
+            //{
+            //    MatchBone();
+            //}
         }
         if (bPlay)
         {
@@ -239,35 +239,35 @@ public class FBAni_Inspector : Editor
         }
         return b.GetHashCode();
     }
-    void MatchBone()
-    {
+    //void MatchBone()
+    //{
 
-        var con = target as FB.PosePlus.AniPlayer;
+    //    var con = target as FB.PosePlus.AniPlayer;
 
-        List<string> bones = con.clips[0].boneinfo;
-        //foreach(var ani in con.clips)
-        //{
-        //    foreach(var b in ani.boneinfo)
-        //    {
-        //        if(bones.Contains(b)==false)
-        //        {
-        //            bones.Add(b);
-        //        }
-        //    }
-        //}
-        int hashfirst = calcbonehash(bones);
-        foreach (var ani in con.clips)
-        {
-            int hash = calcbonehash(ani.boneinfo);
-            if (hash != hashfirst)
-            {
-                Debug.LogWarning("动画：" + ani.name + "骨骼需要匹配");
-                if (ani.MatchBone(con.clips[0]) == false)
-                    return;
-                EditorUtility.SetDirty(ani);
-            }
-        }
-    }
+    //    List<string> bones = con.clips[0].boneinfo;
+    //    //foreach(var ani in con.clips)
+    //    //{
+    //    //    foreach(var b in ani.boneinfo)
+    //    //    {
+    //    //        if(bones.Contains(b)==false)
+    //    //        {
+    //    //            bones.Add(b);
+    //    //        }
+    //    //    }
+    //    //}
+    //    int hashfirst = calcbonehash(bones);
+    //    foreach (var ani in con.clips)
+    //    {
+    //        int hash = calcbonehash(ani.boneinfo);
+    //        if (hash != hashfirst)
+    //        {
+    //            Debug.LogWarning("动画：" + ani.name + "骨骼需要匹配");
+    //            if (ani.MatchBone(con.clips[0]) == false)
+    //                return;
+    //            EditorUtility.SetDirty(ani);
+    //        }
+    //    }
+    //}
     //TreeNode tree = null;
     //class TreeNode : List<TreeNode>
     //{

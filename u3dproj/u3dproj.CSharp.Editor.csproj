@@ -84,15 +84,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="u3dproj.CSharp.csproj">
+      <Project>{B28DB6B1-727D-2B72-EC8A-44ACA5DDB925}</Project>
+      <Name>u3dproj.CSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Assets\EgretUnity\Editor\Inspector_Animator.cs" />
+    <Compile Include="Assets\EgretUnity\Editor\Inspector_FBAni.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_BoxCollider.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshFilter.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_SkinnedMeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Transform.cs" />
-    <Compile Include="Assets\EgretUnity\Editor\lib\Helper\BitHelper.cs" />
-    <Compile Include="Assets\EgretUnity\Editor\lib\Helper\ResLibTool.cs" />
-    <Compile Include="Assets\EgretUnity\Editor\lib\Helper\stringHelper.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\MatParser\NewMatParser.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\interface.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\myjson\MyJson.cs" />
