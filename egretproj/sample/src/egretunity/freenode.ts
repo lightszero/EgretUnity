@@ -163,7 +163,7 @@ namespace FreeNode
                     var name = <string>obj["Name"];
                     var len = <number>obj["Length"];
                     var extname = name.substr(name.indexOf("."));
-                    if (extname == ".mesh.bin")
+                    if (extname == ".mesh.bin" || extname == ".aniclip.bin")
                     {
                         box.loadBin(baseurl, name);
                         //console.log("got mesh" + name + "|len=" + len);

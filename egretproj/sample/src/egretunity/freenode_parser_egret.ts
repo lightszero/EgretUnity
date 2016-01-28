@@ -4,15 +4,6 @@
 namespace FreeNode.ForEgret3D
 {
 
-    export class Node extends egret3d.Mesh //继承Babylon的Mesh扩展我们的节点
-    {
-        constructor(name: string)
-        {
-            super(null, null);
-        }
-        //增加组件信息
-        componentinfo: {}
-    }
     export class Entity extends egret3d.Entity
     {
         comps: Array<{}> = [];//记录组件信息
@@ -92,6 +83,10 @@ namespace FreeNode.ForEgret3D
             else if (json["type"] == "skinnedmeshrenderer")
             {
                 this._parseSkinnedMeshRenderer(json, box, parent);
+            }
+            else if (json["type"] == "aniplayer")
+            {
+                this._parseAniPlayer(json, box, parent);
             }
             else
             {
@@ -461,6 +456,18 @@ namespace FreeNode.ForEgret3D
 
             }
             //parent.material = mat;
+        }
+        _parseAniPlayer(json: {}, box: FreeNode.StreamBox, node: Entity): void
+        {
+            var anis = {};
+            for (var i = 0; i < (<[]>json["clips"]).length; i++)
+            {
+                var clipname = json["clips"][i];
+                var clip = AniClipData.loadClip(box.cacheBin[clipname]);
+                anis[clipname] = clip;
+            }
+            node.comps.push(anis);
+
         }
     }
 }
