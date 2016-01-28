@@ -17,7 +17,7 @@ namespace FB.PosePlus
         public Vector3 s;
 
         [SerializeField]
-        Quaternion r = Quaternion.identity;
+        public Quaternion r = Quaternion.identity;
 
 
         public enum changetag

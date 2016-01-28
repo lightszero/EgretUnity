@@ -174,121 +174,121 @@ namespace FB.PosePlus
                 frames[i].fid = i;
             }
         }
-        public void ResetBoxLerpFrameSegment(int frame)
-        {
-            //搜索开始与结束帧
-            if (frames[frame].box_key) return;
-            if (frame <= 0 || frame >= frames.Count - 1) return;
+        //public void ResetBoxLerpFrameSegment(int frame)
+        //{
+        //    //搜索开始与结束帧
+        //    if (frames[frame].box_key) return;
+        //    if (frame <= 0 || frame >= frames.Count - 1) return;
 
-            int ibegin = frame;
-            for (; ibegin >= 0; ibegin--)
-            {
-                if (frames[ibegin].box_key)
-                {
-                    break;
-                }
-            }
-            if (ibegin == frame) return;
-            int iend = frame;
-            for (; iend < frames.Count; iend++)
-            {
-                if (frames[iend].box_key)
-                {
-                    break;
-                }
-            }
-            if (iend == frame) return;
-            //建立对位关系
-            Dictionary<AniBoxCollider, AniBoxCollider> map = new Dictionary<AniBoxCollider, AniBoxCollider>();
-            var leftlist = frames[ibegin].boxesinfo;
-            var rightlist = frames[iend].boxesinfo;
-            for (int i = 0; i < leftlist.Count; i++)
-            {
-                //对位
-                AniBoxCollider boxcollider = rightlist.Find(b => b.mIndex == leftlist[i].mIndex && b.mBoxType == leftlist[i].mBoxType);
-                //
-                map.Add(leftlist[i], boxcollider);
-            }
-            //找到两个Box关键帧之间插值
-            for (int i = ibegin + 1; i < iend; i++)
-            {
-                float d1 = (i - ibegin);
-                float d2 = (iend - i);
-                float lerp = d1 / (d1 + d2);
-                List<AniBoxCollider> colliderList = new List<AniBoxCollider>();
-                foreach (var b in map.Keys)
-                {
-                    if (map[b] == null)
-                    {
-                        colliderList.Add(b);
-                        continue;
-                    }
-                    else
-                    {
-                        colliderList.Add(AniBoxCollider.Lerp(b, map[b], lerp));
-                    }
-                }
-                frames[i].boxesinfo = new List<AniBoxCollider>(colliderList);
-            }
-        }
+        //    int ibegin = frame;
+        //    for (; ibegin >= 0; ibegin--)
+        //    {
+        //        if (frames[ibegin].box_key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (ibegin == frame) return;
+        //    int iend = frame;
+        //    for (; iend < frames.Count; iend++)
+        //    {
+        //        if (frames[iend].box_key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (iend == frame) return;
+        //    //建立对位关系
+        //    Dictionary<AniBoxCollider, AniBoxCollider> map = new Dictionary<AniBoxCollider, AniBoxCollider>();
+        //    var leftlist = frames[ibegin].boxesinfo;
+        //    var rightlist = frames[iend].boxesinfo;
+        //    for (int i = 0; i < leftlist.Count; i++)
+        //    {
+        //        //对位
+        //        AniBoxCollider boxcollider = rightlist.Find(b => b.mIndex == leftlist[i].mIndex && b.mBoxType == leftlist[i].mBoxType);
+        //        //
+        //        map.Add(leftlist[i], boxcollider);
+        //    }
+        //    //找到两个Box关键帧之间插值
+        //    for (int i = ibegin + 1; i < iend; i++)
+        //    {
+        //        float d1 = (i - ibegin);
+        //        float d2 = (iend - i);
+        //        float lerp = d1 / (d1 + d2);
+        //        List<AniBoxCollider> colliderList = new List<AniBoxCollider>();
+        //        foreach (var b in map.Keys)
+        //        {
+        //            if (map[b] == null)
+        //            {
+        //                colliderList.Add(b);
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                colliderList.Add(AniBoxCollider.Lerp(b, map[b], lerp));
+        //            }
+        //        }
+        //        frames[i].boxesinfo = new List<AniBoxCollider>(colliderList);
+        //    }
+        //}
 
-        public void ResetDotLerpFrameSegment(int frame)
-        {
-            //搜索开始与结束帧
-            if (frames[frame].dot_key) return;
-            if (frame <= 0 || frame >= frames.Count - 1) return;
+        //public void ResetDotLerpFrameSegment(int frame)
+        //{
+        //    //搜索开始与结束帧
+        //    if (frames[frame].dot_key) return;
+        //    if (frame <= 0 || frame >= frames.Count - 1) return;
 
-            int ibegin = frame;
-            for (; ibegin >= 0; ibegin--)
-            {
-                if (frames[ibegin].dot_key)
-                {
-                    break;
-                }
-            }
-            if (ibegin == frame) return;
-            int iend = frame;
-            for (; iend < frames.Count; iend++)
-            {
-                if (frames[iend].dot_key)
-                {
-                    break;
-                }
-            }
-            if (iend == frame) return;
-            //建立对位关系
-            Dictionary<Dot, Dot> map = new Dictionary<Dot, Dot>();
-            var leftlist = frames[ibegin].dotesinfo;
-            var rightlist = frames[iend].dotesinfo;
-            for (int i = 0; i < leftlist.Count; i++)
-            {
-                //对位
-                Dot dot = rightlist.Find(b => b.name == leftlist[i].name);
-                //
-                map.Add(leftlist[i], dot);
-            }
-            //找到两个Box关键帧之间插值
-            for (int i = ibegin + 1; i < iend; i++)
-            {
-                float d1 = (i - ibegin);
-                float d2 = (iend - i);
-                float lerp = d1 / (d1 + d2);
-                List<Dot> colliderList = new List<Dot>();
-                foreach (var b in map.Keys)
-                {
-                    if (map[b] == null)
-                    {
-                        colliderList.Add(b);
-                        continue;
-                    }
-                    else
-                    {
-                        colliderList.Add(Dot.Lerp(b, map[b], lerp));
-                    }
-                }
-                frames[i].dotesinfo = new List<Dot>(colliderList);
-            }
-        }
+        //    int ibegin = frame;
+        //    for (; ibegin >= 0; ibegin--)
+        //    {
+        //        if (frames[ibegin].dot_key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (ibegin == frame) return;
+        //    int iend = frame;
+        //    for (; iend < frames.Count; iend++)
+        //    {
+        //        if (frames[iend].dot_key)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //    if (iend == frame) return;
+        //    //建立对位关系
+        //    Dictionary<Dot, Dot> map = new Dictionary<Dot, Dot>();
+        //    var leftlist = frames[ibegin].dotesinfo;
+        //    var rightlist = frames[iend].dotesinfo;
+        //    for (int i = 0; i < leftlist.Count; i++)
+        //    {
+        //        //对位
+        //        Dot dot = rightlist.Find(b => b.name == leftlist[i].name);
+        //        //
+        //        map.Add(leftlist[i], dot);
+        //    }
+        //    //找到两个Box关键帧之间插值
+        //    for (int i = ibegin + 1; i < iend; i++)
+        //    {
+        //        float d1 = (i - ibegin);
+        //        float d2 = (iend - i);
+        //        float lerp = d1 / (d1 + d2);
+        //        List<Dot> colliderList = new List<Dot>();
+        //        foreach (var b in map.Keys)
+        //        {
+        //            if (map[b] == null)
+        //            {
+        //                colliderList.Add(b);
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                colliderList.Add(Dot.Lerp(b, map[b], lerp));
+        //            }
+        //        }
+        //        frames[i].dotesinfo = new List<Dot>(colliderList);
+        //    }
+        //}
         public void ResetLerpFrameAll()
         {
             for (int ibegin = 0; ibegin < frames.Count - 1; ibegin++)

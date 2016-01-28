@@ -126,11 +126,16 @@ namespace FB.PosePlus
                 Frame f = new Frame();
 
                 float l = 1.0f - _crossTimer / _crossTimerTotal;
+                lastClip.frames[lastframe].boneinfo = lastClip.boneinfo;
+                lastClip.frames[lastframe].bonehash = lastClip.bonehash;
                 crossFrame = Frame.Lerp(crossFrame, lastClip.frames[lastframe], l);
+
             }
             else
             {
                 crossFrame = lastClip.frames[lastframe];
+                crossFrame.boneinfo = lastClip.boneinfo;
+                crossFrame.bonehash = lastClip.bonehash;
             }
         }
         float timer = 0;
@@ -221,10 +226,14 @@ namespace FB.PosePlus
 
 
                     float l = 1.0f - _crossTimer / _crossTimerTotal;
-                    SetPoseLerp(crossFrame, lastClip.frames[frame], l);
+
 
                     lastframe = frame;
                     frameNow = lastClip.frames[frame];
+                    frameNow.boneinfo = lastClip.boneinfo;
+                    frameNow.bonehash = lastClip.bonehash;
+
+                    SetPoseLerp(crossFrame, frameNow, l);
 
                 }
             }
@@ -285,13 +294,27 @@ namespace FB.PosePlus
             lastframe = frame;
 
         }
-
-        public void SetPoseLerp(Frame src, Frame dest, float lerp)
+        public void SetPose(Frame frame)
         {
+            if (frame.bonehash != transcode)
+            {
+                trans = new Transform[frame.boneinfo.Count];
+                for (int i = 0; i < frame.boneinfo.Count; i++)
+                {
+                    trans[i] = this.transform.Find(frame.boneinfo[i]);
+                }
+                transcode = frame.bonehash;
+            }
             for (int i = 0; i < trans.Length; i++)
             {
-                src.bonesinfo[i].UpdateTranLerp(trans[i], dest.bonesinfo[i], lerp);
+                frame.bonesinfo[i].UpdateTran(trans[i], true);
             }
+
+        }
+        public void SetPoseLerp(Frame src, Frame dest, float lerp)
+        {
+            var frame = Frame.Lerp(src, dest, lerp);
+            SetPose(frame);
 
         }
 
