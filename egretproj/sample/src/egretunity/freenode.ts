@@ -549,6 +549,10 @@ namespace FreeNode
         x: number;
         y: number;
         z: number;
+        Clone(): Vector3
+        {
+            return new Vector3(this.x, this.y, this.z);
+        }
     }
     export class Quaternion
     {
@@ -563,6 +567,10 @@ namespace FreeNode
         y: number;
         z: number;
         w: number;
+        Clone(): Quaternion
+        {
+            return new Quaternion(this.x, this.y, this.z, this.w);
+        }
     }
     export class SubClip
     {
@@ -598,6 +606,45 @@ namespace FreeNode
             p.tag = this.tag;
             return p;
         }
+        load(read: Reader, last: PoseBoneMatrix)
+        {
+            this.tag = <changetag>read.readUInt8();
+            var savetag = <changetag>read.readUInt8();
+            if ((savetag & changetag.Rotate) > 0)
+            {
+                var x = read.readSingle();
+                var y = read.readSingle();
+                var z = read.readSingle();
+                var w = read.readSingle();
+                this.r = new Quaternion(x, y, z, w);
+            }
+            else
+            {
+                this.r = last.r.Clone();
+            }
+            if ((savetag & changetag.Trans) > 0)
+            {
+                var x = read.readSingle();
+                var y = read.readSingle();
+                var z = read.readSingle();
+                this.t = new Vector3(x, y, z);
+            }
+            else
+            {
+                this.t = last.t.Clone();
+            }
+            if ((savetag & changetag.Scale) > 0)
+            {
+                var x = read.readSingle();
+                var y = read.readSingle();
+                var z = read.readSingle();
+                this.s = new Vector3(x, y, z);
+            }
+            else
+            {
+                this.s = last.s.Clone();
+            }
+        }
     }
     export class Frame
     {
@@ -605,7 +652,7 @@ namespace FreeNode
         key: boolean;
         bonedata: PoseBoneMatrix[];
     }
-    export class AniClip
+    export class AniClipData
     {
         name: string;
         fps: number;
@@ -613,6 +660,59 @@ namespace FreeNode
         boneinfo: string[];
         subclips: SubClip[];
         frames: Frame[];
+
+        static loadClip(buf: ArrayBuffer): AniClipData
+        {
+            var clipdata: AniClipData = new AniClipData();
+            var read: Reader = new Reader(buf);
+            clipdata.name = read.readString();
+            clipdata.fps = read.readSingle();
+            clipdata.loop = read.readUInt8() > 0;
+            {//boneinfo
+                var bcount = read.readUInt32();
+                clipdata.boneinfo = [];
+                for (var i = 0; i < bcount; i++)
+                {
+                    clipdata.boneinfo.push(read.readString());
+                }
+            }
+            {
+                //subclips
+                clipdata.subclips = [];
+                var scount = read.readUInt32();
+                for (var i = 0; i < scount; i++)
+                {
+                    var sc = new SubClip();
+                    sc.name = read.readString();
+                    sc.loop = read.readUInt8() > 0;
+                    sc.startframe = read.readUInt32();
+                    sc.endframe = read.readUInt32();
+
+                    clipdata.subclips.push(sc);
+                }
+            }
+            {//frame
+                clipdata.frames = [];
+                var fcount = read.readUInt32();
+
+                for (var i = 0; i < fcount; i++)
+                {
+                    var f = new Frame();
+                    f.fid = read.readUInt32();
+                    f.key = read.readUInt8() > 0;
+                    clipdata.frames.push(f);
+
+                    clipdata.frames[i].bonedata = [];
+                    for (var ib = 0; ib < clipdata.boneinfo.length; ib++)
+                    {
+                        clipdata.frames[i].bonedata.push(new PoseBoneMatrix());
+                        clipdata.frames[i].bonedata[ib].load(read,
+                            i > 0 ? clipdata.frames[i - 1].bonedata[ib] : null);
+                    }
+                }
+            }
+            return clipdata;
+        }
     }
     export class SceneParser
     {

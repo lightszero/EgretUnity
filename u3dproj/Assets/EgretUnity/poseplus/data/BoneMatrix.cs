@@ -177,7 +177,7 @@ namespace FB.PosePlus
             this.tag = (PoseBoneMatrix.changetag)btag[0];
             PoseBoneMatrix.changetag savetag = (PoseBoneMatrix.changetag)btag[1];
             //Debug.LogWarning("savetag=" + this.tag + "|" + savetag); 
-            if (last==null||(savetag & PoseBoneMatrix.changetag.Rotate) > 0)
+            if ((savetag & PoseBoneMatrix.changetag.Rotate) > 0)
             {
                 byte[] buf = new byte[16];
                 stream.Read(buf, 0, 16);
@@ -187,7 +187,7 @@ namespace FB.PosePlus
             {
                 r = last.r;
             }
-            if (last == null || (savetag & PoseBoneMatrix.changetag.Trans) > 0)
+            if ((savetag & PoseBoneMatrix.changetag.Trans) > 0)
             {
                 byte[] buf = new byte[12];
                 stream.Read(buf, 0, 12);
@@ -197,7 +197,7 @@ namespace FB.PosePlus
             {
                 t = last.t;
             }
-            if (last == null || (savetag & PoseBoneMatrix.changetag.Scale) > 0)
+            if ((savetag & PoseBoneMatrix.changetag.Scale) > 0)
             {
                 byte[] buf = new byte[12];
                 stream.Read(buf, 0, 12);
