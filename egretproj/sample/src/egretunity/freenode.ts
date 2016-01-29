@@ -9,6 +9,8 @@ namespace FreeNode
         ParseNode(parser: SceneParser, json: {}, parent: any): any;//处理节点
 
         ParseComponent(parser: SceneParser, json: {}, box: FreeNode.StreamBox, parent: any): any;//处理组件
+
+        DelayParse(): void;
     }
     export class Error//typescirpt 使用export关键字
     {
@@ -733,7 +735,9 @@ namespace FreeNode
             var txt = this.box.FindTxt(".jsontree.txt");
             var scene = <{}>JSON.parse(txt);
 
-            return this._parseNode(scene, null);
+            var obj = this._parseNode(scene, null);
+            this.parser.DelayParse();
+            return obj;
         }
         private _parseNode(json: {}, pnode: any): any
         {

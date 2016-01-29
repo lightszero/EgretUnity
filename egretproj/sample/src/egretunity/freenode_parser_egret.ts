@@ -6,6 +6,8 @@ namespace FreeNode.ForEgret3D
 
     export class Entity extends egret3d.Entity
     {
+        uuid: number;
+        fullname: string;
         comps: Array<{}> = [];//记录组件信息
     }
     export class Entity_Mesh extends egret3d.Mesh
@@ -14,6 +16,8 @@ namespace FreeNode.ForEgret3D
         {
             super(new egret3d.SubGeometry(), new egret3d.TextureMaterial());
         }
+        uuid: number;
+        fullname: string;
         comps: Array<{}> = [];//记录组件信息
     }
     export class Parser implements FreeNode.IParser
@@ -22,8 +26,11 @@ namespace FreeNode.ForEgret3D
         {
             this.view = view;
             this.lightGroup = lightGroup;
+            this.delaycall = [];
+            this.mapNode = {};
         }
-
+        delaycall: Array<Function>;
+        mapNode: { [id: number]: (Entity | Entity_Mesh) };
         view: egret3d.View3D;
         lightGroup: egret3d.LightGroup;
         ParseNode(parser: FreeNode.SceneParser, json: {}, parent: any): any//处理节点
@@ -43,7 +50,7 @@ namespace FreeNode.ForEgret3D
                 }
             }
 
-            var n: egret3d.Object3D = null;
+            var n: any = null;
             if (ismesh == true)
             {
                 n = new Entity_Mesh();
@@ -53,17 +60,28 @@ namespace FreeNode.ForEgret3D
                 n = new Entity();
             }
             n.name = json["name"];
-            console.log("parseNode:" + n.name + " ismesh:" + ismesh);
+            n.uuid = json["id"];
             if (parent != null)
             {
                 var pobj = <egret3d.Object3D>parent;
                 pobj.addChild(n);
-
+                if (n.parent instanceof (Entity) || n.parent instanceof (Entity_Mesh))
+                {
+                    n.fullname = n.parent.fullname + "/" + n.name;
+                }
+                else
+                {
+                    n.fullname = n.name;
+                }
             }
             else
             {
+                n.fullname = n.name;
                 this.view.root.addChild(n);
             }
+            this.mapNode[n.uuid] = n;
+            console.log("parseNode:" + n.fullname + "|" + n.uuid + " ismesh:" + ismesh);
+
             return n;
         }
         ParseComponent(parser: FreeNode.SceneParser, json: {}, box: FreeNode.StreamBox, parent: any): any//处理组件
@@ -93,7 +111,15 @@ namespace FreeNode.ForEgret3D
                 console.warn("not parse com:" + json["type"]);
                 return;
             }
-            console.log("parse com:" + json["type"]);
+            //console.log("parse com:" + json["type"]);
+        }
+        DelayParse(): void
+        {
+            for (var i = 0; i < this.delaycall.length; i++)
+            {
+                this.delaycall[i]();
+            }
+            this.delaycall = null;
         }
         _parseTransform(json: {}, box: FreeNode.StreamBox, node: Entity)
         {
@@ -116,7 +142,7 @@ namespace FreeNode.ForEgret3D
             var ruler3 = quat.toEulerAngles();
             node.orientation = quat;
 
-            console.log("name=" + node.name + "vec3=" + vec3.toString() + " scale3=" + scale3.toString() + " ruler3=" + ruler3.toString());
+            //console.log("name=" + node.name + "vec3=" + vec3.toString() + " scale3=" + scale3.toString() + " ruler3=" + ruler3.toString());
 
         }
         _parseMeshFilter(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
@@ -145,7 +171,7 @@ namespace FreeNode.ForEgret3D
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
         }
 
-        __FillSkeleton(skeleton: egret3d.Skeleton, _data: MeshData): void
+        __FillSkeleton(skeleton: egret3d.Skeleton, _json: {}, _data: MeshData): void
         {
             skeleton.joints = [];
             for (var i = 0; i < _data.vec10tpose.length / 10; i++)
@@ -308,7 +334,7 @@ namespace FreeNode.ForEgret3D
         }
         _parseMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
-            console.log("set _parseMeshRenderer");
+            //console.log("set _parseMeshRenderer");
             node.material = new egret3d.TextureMaterial();
             node.material.lightGroup = this.lightGroup;
             node.material.specularColor = 0xffffff;
@@ -358,7 +384,7 @@ namespace FreeNode.ForEgret3D
         }
         _parseSkinnedMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
-            console.log("set _parseSkinnedMeshRenderer");
+            //console.log("set _parseSkinnedMeshRenderer");
             node.geometry = new egret3d.SkinGeometry();
             var geom = <egret3d.SkinGeometry>node.geometry;
             var meshname = <string>json["mesh"];
@@ -379,34 +405,48 @@ namespace FreeNode.ForEgret3D
             //geom.setGeomtryData(indexData, verticesData);
 
             //geom.numItems = geom.indexData.length;
-            var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
-            this.__FillSkeleton(_initskeleton, _data);
-            geom.setGeomtryData(indexData, verticesData, _initskeleton);
+            geom.setGeomtryData(indexData, verticesData, null);
+            this.delaycall.push(
+                () =>
+                {
+                    var rbname = this.mapNode[json["rootboneobj"]].fullname;
+                    console.log("__bonename:" + rbname);
+                    var bones = <string[]>json["boneobjs"];
+                    for (var i = 0; i < bones.length; i++)
+                    {
+                        console.log("__ssbone:" + this.mapNode[bones[i]].fullname);
+                    }
 
+                    var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
+                    this.__FillSkeleton(_initskeleton, json, _data);
+                    geom.initialSkeleton = _initskeleton;
+                    node.animation = new egret3d.SkeletonAnimation(_initskeleton);
+
+                }
+            );
             geom.buildGeomtry();
             geom.buildBoundBox();
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
             {
-                //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
-                node.animation = new egret3d.SkeletonAnimation(_initskeleton);
-                var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
-                var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
-                clip.frameCount = 1;
-                var pose1 = new egret3d.Skeleton(_initskeleton);
-                pose1.numJoint = _initskeleton.numJoint;
-                for (var i = 0; i < _initskeleton.numJoint; i++)
-                {
-                    var joint = new egret3d.Joint(_initskeleton.joints[i].name);
-                    joint.setLocalTransform(_initskeleton.joints[i].orientation, new egret3d.Vector3D(1, 1, 1), _initskeleton.joints[i].translation);
-                    pose1.joints.push(joint);
-                }
-                //pose1.reset();
-                clip.poseArray = [pose1];
-                //clip.currentFrameIndex = 0;
-                //clip.fillFrame(_initskeleton);
+                //    //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
+                //    var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
+                //    var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
+                //    clip.frameCount = 1;
+                //    var pose1 = new egret3d.Skeleton(_initskeleton);
+                //    pose1.numJoint = _initskeleton.numJoint;
+                //    for (var i = 0; i < _initskeleton.numJoint; i++)
+                //    {
+                //        var joint = new egret3d.Joint(_initskeleton.joints[i].name);
+                //        joint.setLocalTransform(_initskeleton.joints[i].orientation, new egret3d.Vector3D(1, 1, 1), _initskeleton.joints[i].translation);
+                //        pose1.joints.push(joint);
+                //    }
+                //    //pose1.reset();
+                //    clip.poseArray = [pose1];
+                //    //clip.currentFrameIndex = 0;
+                //    //clip.fillFrame(_initskeleton);
 
-                skani.addSkeletonAnimationClip(clip);
-                skani.play("p1");
+                //    skani.addSkeletonAnimationClip(clip);
+                //    skani.play("p1");
             }
             //end mesh
 
