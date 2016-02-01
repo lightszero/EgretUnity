@@ -57,9 +57,9 @@ namespace FreeNode.ForEgret3D
             }
             else
             {
-                //n = new Entity();
-                n = new Entity_Mesh();
-                n.geometry = new egret3d.CubeGeometry(0.1, 0.1, 0.1);
+                n = new Entity();
+                //n = new Entity_Mesh();
+                //n.geometry = new egret3d.CubeGeometry(0.1, 0.1, 0.1);
             }
             n.name = json["name"];
             n.uuid = json["id"];
@@ -173,18 +173,18 @@ namespace FreeNode.ForEgret3D
             node.box.fillBox(node.geometry.minPos, node.geometry.maxPos);
         }
 
-        __FillSkeletonFromCurrent(skeleton: egret3d.Skeleton, json: {}): void
-        {
-            skeleton.numJoint = skeleton.initialSkeleton.numJoint;
+        //__FillSkeletonFromCurrent(skeleton: egret3d.Skeleton, json: {}): void
+        //{
+        //    skeleton.numJoint = skeleton.initialSkeleton.numJoint;
 
-            var rbname = this.mapNode[json["rootboneobj"]].fullname;
-            console.log("__bonename:" + rbname);
-            var bones = <string[]>json["boneobjs"];
-            for (var i = 0; i < bones.length; i++)
-            {
-                console.log("__ssbone:" + this.mapNode[bones[i]].fullname);
-            }
-        }
+        //    var rbname = this.mapNode[json["rootboneobj"]].fullname;
+        //    console.log("__bonename:" + rbname);
+        //    var bones = <string[]>json["boneobjs"];
+        //    for (var i = 0; i < bones.length; i++)
+        //    {
+        //        console.log("__ssbone:" + this.mapNode[bones[i]].fullname);
+        //    }
+        //}
         __FillSkinFromTran(json: {}, _data: MeshData): SkinFromTrans
         {
             var tpose: egret3d.Matrix4_4[] = [];
@@ -213,50 +213,50 @@ namespace FreeNode.ForEgret3D
             //var skin = new egret3d.SkeletonAnimation(skeleton);
             return skin;
         }
-        __FillTPoseSkeleton(skeleton: egret3d.Skeleton, json: {}, _data: MeshData): void
-        {
-            var rbname = this.mapNode[json["rootboneobj"]].fullname;
-            console.log("__bonename:" + rbname);
-            var bones = <string[]>json["boneobjs"];
+        //__FillTPoseSkeleton(skeleton: egret3d.Skeleton, json: {}, _data: MeshData): void
+        //{
+        //    var rbname = this.mapNode[json["rootboneobj"]].fullname;
+        //    console.log("__bonename:" + rbname);
+        //    var bones = <string[]>json["boneobjs"];
 
 
-            skeleton.joints = [];
-            for (var i = 0; i < _data.vec10tpose.length / 10; i++)
-            {
-                var node = this.mapNode[bones[i]];
-                var joint: egret3d.Joint = new egret3d.Joint(node.uuid);
+        //    skeleton.joints = [];
+        //    for (var i = 0; i < _data.vec10tpose.length / 10; i++)
+        //    {
+        //        var node = this.mapNode[bones[i]];
+        //        var joint: egret3d.Joint = new egret3d.Joint(node.uuid);
 
-                for (var j = 0; j < bones.length; j++)
-                {
-                    if (bones[j] == node.parent.uuid)
-                    {
-                        joint.parentIndex = j;
-                        joint.parent = node.parent.uuid.toString();
-                        break;
-                    }
-                }
-                //joint.
-                var translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
-                //joint.
-                var scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
-                //joint.
-                var orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
+        //        for (var j = 0; j < bones.length; j++)
+        //        {
+        //            if (bones[j] == node.parent.uuid)
+        //            {
+        //                joint.parentIndex = j;
+        //                joint.parent = node.parent.uuid.toString();
+        //                break;
+        //            }
+        //        }
+        //        //joint.
+        //        var translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
+        //        //joint.
+        //        var scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
+        //        //joint.
+        //        var orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
 
-                var mat: egret3d.Matrix4_4 = new egret3d.Matrix4_4();
-                mat.makeTransform(translation, scale, orientation);
-                joint.inverseBindPose = mat.clone();//  new egret3d.Matrix4_4();
+        //        var mat: egret3d.Matrix4_4 = new egret3d.Matrix4_4();
+        //        mat.makeTransform(translation, scale, orientation);
+        //        joint.inverseBindPose = mat.clone();//  new egret3d.Matrix4_4();
 
-                //{//setLocalTransform 对根骨骼没有什么意义，只是测试
-                //    mat.invert();
-                //    var vec = mat.decompose(egret3d.Orientation3D.QUATERNION);
-                //    joint.setLocalTransform(new egret3d.Quaternion(vec[1].x, vec[1].y, vec[1].z, vec[2].w), vec[2], vec[0]);
-                //}
-                skeleton.joints.push(joint);
-            }
-            skeleton.numJoint = skeleton.joints.length;
-            //skeleton.reset();
+        //        //{//setLocalTransform 对根骨骼没有什么意义，只是测试
+        //        //    mat.invert();
+        //        //    var vec = mat.decompose(egret3d.Orientation3D.QUATERNION);
+        //        //    joint.setLocalTransform(new egret3d.Quaternion(vec[1].x, vec[1].y, vec[1].z, vec[2].w), vec[2], vec[0]);
+        //        //}
+        //        skeleton.joints.push(joint);
+        //    }
+        //    skeleton.numJoint = skeleton.joints.length;
+        //    //skeleton.reset();
 
-        }
+        //}
         __FillGeomVertex(verticesData: number[], _data: MeshData, withskin: boolean): void
         {
             for (var i = 0; i < _data.vec3positions.length / 3; i++)
