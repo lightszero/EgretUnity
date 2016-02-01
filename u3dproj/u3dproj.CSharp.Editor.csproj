@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>WebPlayer:6</UnityBuildTarget>
     <UnityVersion>5.3.1p4</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -54,30 +52,6 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEditor.Advertisements.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>Library\UnityAssemblies\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.EditorTestsRunner">
-      <HintPath>Library\UnityAssemblies\UnityEditor.EditorTestsRunner.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.UI">
-      <HintPath>Library\UnityAssemblies\UnityEditor.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEditor.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.TreeEditor">
-      <HintPath>Library\UnityAssemblies\UnityEditor.TreeEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor.Graphs">
       <HintPath>Library\UnityAssemblies\UnityEditor.Graphs.dll</HintPath>
     </Reference>
@@ -94,9 +68,9 @@
   <ItemGroup>
     <Compile Include="Assets\EgretUnity\Editor\Inspector_Animator.cs" />
     <Compile Include="Assets\EgretUnity\Editor\Inspector_FBAni.cs" />
+    <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Aniplayer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_BoxCollider.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshFilter.cs" />
-    <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Aniplayer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_MeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_SkinnedMeshRenderer.cs" />
     <Compile Include="Assets\EgretUnity\Editor\lib\ComponentParser\ComponetParser_Transform.cs" />

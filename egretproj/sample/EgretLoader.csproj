@@ -130,6 +130,7 @@
     <TypeScriptCompile Include="libs\egret3d.d.ts" />
     <TypeScriptCompile Include="src\egretunity\egretunity.ts" />
     <TypeScriptCompile Include="src\egretunity\freenode.ts" />
+    <TypeScriptCompile Include="src\egretunity\freenode_egret_ani.ts" />
     <TypeScriptCompile Include="src\egretunity\freenode_parser_egret.ts" />
     <TypeScriptCompile Include="src\SampleScene.ts" />
     <TypeScriptCompile Include="src\Main.ts" />

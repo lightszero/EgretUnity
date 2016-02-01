@@ -185,6 +185,34 @@ namespace FreeNode.ForEgret3D
                 console.log("__ssbone:" + this.mapNode[bones[i]].fullname);
             }
         }
+        __FillSkinFromTran(json: {}, _data: MeshData): SkinFromTrans
+        {
+            var tpose: egret3d.Matrix4_4[] = [];
+            var bones: egret3d.Object3D[] = [];
+            var jsonbones = <string[]>json["boneobjs"];
+
+            for (var i = 0; i < _data.vec10tpose.length / 10; i++)
+            {
+                var translation = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 0], _data.vec10tpose[i * 10 + 1], _data.vec10tpose[i * 10 + 2]);
+                var scale = new egret3d.Vector3D(_data.vec10tpose[i * 10 + 3], _data.vec10tpose[i * 10 + 4], _data.vec10tpose[i * 10 + 5]);
+                var orientation = new egret3d.Quaternion(_data.vec10tpose[i * 10 + 6], _data.vec10tpose[i * 10 + 7], _data.vec10tpose[i * 10 + 8], _data.vec10tpose[i * 10 + 9]);
+
+                var mat: egret3d.Matrix4_4 = new egret3d.Matrix4_4();
+                mat.makeTransform(translation, scale, orientation);
+                tpose.push(mat);
+                var node = this.mapNode[jsonbones[i]];
+                bones.push(node);
+            }
+            var skin = new SkinFromTrans(tpose, bones);
+            //var skeleton = new egret3d.Skeleton();
+            //skeleton.joints = [];
+            //var joint: egret3d.Joint = new egret3d.Joint("t");
+            //joint.inverseBindPose = new egret3d.Matrix4_4();
+            //skeleton.joints.push(joint);
+            //skeleton.numJoint = skeleton.joints.length;
+            //var skin = new egret3d.SkeletonAnimation(skeleton);
+            return skin;
+        }
         __FillTPoseSkeleton(skeleton: egret3d.Skeleton, json: {}, _data: MeshData): void
         {
             var rbname = this.mapNode[json["rootboneobj"]].fullname;
@@ -216,11 +244,13 @@ namespace FreeNode.ForEgret3D
 
                 var mat: egret3d.Matrix4_4 = new egret3d.Matrix4_4();
                 mat.makeTransform(translation, scale, orientation);
-                joint.setLocalTransform(orientation, scale, translation);
                 joint.inverseBindPose = mat.clone();//  new egret3d.Matrix4_4();
-                //joint.inverseBindPose.copyFrom(joint.localMatrix);
-                joint.inverseBindPose.invert();//TPose数据被隐含在一个反转绑定矩阵里
 
+                //{//setLocalTransform 对根骨骼没有什么意义，只是测试
+                //    mat.invert();
+                //    var vec = mat.decompose(egret3d.Orientation3D.QUATERNION);
+                //    joint.setLocalTransform(new egret3d.Quaternion(vec[1].x, vec[1].y, vec[1].z, vec[2].w), vec[2], vec[0]);
+                //}
                 skeleton.joints.push(joint);
             }
             skeleton.numJoint = skeleton.joints.length;
@@ -344,7 +374,6 @@ namespace FreeNode.ForEgret3D
             }
 
         }
-
         __FillGeomIndex(indexData: number[], _data: MeshData): void
         {
             for (var i = 0; i < _data.indices[0].indices.length / 3; i++)
@@ -412,6 +441,7 @@ namespace FreeNode.ForEgret3D
         }
         _parseSkinnedMeshRenderer(json: {}, box: FreeNode.StreamBox, node: Entity_Mesh)
         {
+            node.rotation = new egret3d.Vector3D(0, 0, 0);
             //console.log("set _parseSkinnedMeshRenderer");
             node.geometry = new egret3d.SkinGeometry();
             var geom = <egret3d.SkinGeometry>node.geometry;
@@ -438,48 +468,49 @@ namespace FreeNode.ForEgret3D
                 () =>
                 {
 
+                    var skin = this.__FillSkinFromTran(json, _data);
+                    skin.updateSkeletonMatrixData(node);
+                    //geom.initialSkeleton = _initskeleton;
+                    node.animation = skin; //new SkinFromTrans();
+                    //var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
+                    //this.__FillTPoseSkeleton(_initskeleton, json, _data);
+                    //node.animation =new egret3d.SkeletonAnimation(_initskeleton);
+                    //{
+                    //    //    //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
+                    //    var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
+                    //    var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
+                    //    clip.frameCount = 1;
+                    //    var pose1 = new egret3d.Skeleton(_initskeleton);
+                    //    pose1.numJoint = _initskeleton.numJoint;
+                    //    var world = this.mapNode[json["rootboneobj"]].modelMatrix.clone();
+                    //    world.invert();
+                    //    for (var i = 0; i < _initskeleton.numJoint; i++)
+                    //    {
+                    //        var is = _initskeleton.joints[i];
+                    //        var uuid: number = parseInt(is.name);
+                    //        var joint = new egret3d.Joint(is.name);
+                    //        var setnode = this.mapNode[uuid];
 
-                    var _initskeleton: egret3d.Skeleton = new egret3d.Skeleton();
-                    this.__FillTPoseSkeleton(_initskeleton, json, _data);
-                    geom.initialSkeleton = _initskeleton;
-                    node.animation = new egret3d.SkeletonAnimation(_initskeleton);
+                    //        //joint.parent = is.parent;//这个爹系统有问题
+                    //        //joint.parentIndex = is.parentIndex;
+                    //        if (joint.parentIndex == -1)
+                    //        {
+                    //            console.log("is.t=", "is.s=");
+                    //        }
+                    //        //skani.bindToJointPose(joint.name, setnode);
+                    //        //joint.setLocalTransform(is.orientation, is.scale, is.translation);
+                    //        joint.setLocalTransform(setnode.globalOrientation, setnode.globalScale, setnode.globalPosition);
+                    //        //    new egret3d.Vector3D(1, 1, 1), new egret3d.Vector3D(0,0,0));
+                    //        pose1.joints.push(joint);
+                    //    }
+                    //    //pose1.reset();
+                    //    clip.poseArray = [pose1];
+                    //    //clip.currentFrameIndex = 0;
+                    //    //clip.fillFrame(_initskeleton);
 
-                    {
-                        //    //var sa: egret3d.SkeletonAnimation = new egret3d.SkeletonAnimation(skeleton);
-                        var skani: egret3d.SkeletonAnimation = <egret3d.SkeletonAnimation>node.animation;
-                        var clip: egret3d.SkeletonAnimationClip = new egret3d.SkeletonAnimationClip("p1");
-                        clip.frameCount = 1;
-                        var pose1 = new egret3d.Skeleton(_initskeleton);
-                        pose1.numJoint = _initskeleton.numJoint;
-                        var world = this.mapNode[json["rootboneobj"]].modelMatrix.clone();
-                        world.invert();
-                        for (var i = 0; i < _initskeleton.numJoint; i++)
-                        {
-                            var is = _initskeleton.joints[i];
-                            var uuid: number = parseInt(is.name);
-                            var joint = new egret3d.Joint(is.name);
-                            var setnode = this.mapNode[uuid];
-
-                            joint.parent = is.parent;//怎么感觉爹不爹的没什么区别
-                            joint.parentIndex = is.parentIndex;
-                            if (joint.parentIndex == -1)
-                            {
-                                console.log("is.t=", "is.s=");
-                            }
-
-                            //joint.setLocalTransform(is.orientation, is.scale, is.translation);
-                            joint.setLocalTransform(setnode.orientation, setnode.scale, setnode.position);
-                            //    new egret3d.Vector3D(1, 1, 1), new egret3d.Vector3D(0,0,0));
-                            pose1.joints.push(joint);
-                        }
-                        //pose1.reset();
-                        clip.poseArray = [pose1];
-                        //clip.currentFrameIndex = 0;
-                        //clip.fillFrame(_initskeleton);
-
-                        skani.addSkeletonAnimationClip(clip);
-                        skani.play("p1");
-                    }
+                    //    skani.addSkeletonAnimationClip(clip);
+                    //    skani.play("p1");
+                    //}
                 }
             );
             geom.buildGeomtry();
@@ -572,10 +603,11 @@ namespace FreeNode.ForEgret3D
                     egclip.loop = clip.loop;
                     var posearray = Array<egret3d.Skeleton>();
 
-                    for (var fid = 0; fid < clip.frames.length; i++)
+                    for (var fid = 0; fid < clip.frames.length; fid++)
                     {//zheli xuyao chushi guge
                         var pose: egret3d.Skeleton = new egret3d.Skeleton();
                         clip.frames[fid].bonedata;
+                        posearray.push(pose);
                     }
                     egclip.poseArray = posearray;
                     break;
