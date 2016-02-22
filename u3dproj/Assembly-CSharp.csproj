@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\EgretUnity\Helper\BitHelper.cs" />
      <Compile Include="Assets\EgretUnity\Helper\ResLibTool.cs" />
+     <Compile Include="Assets\EgretUnity\Helper\com_testtpose.cs" />
      <Compile Include="Assets\EgretUnity\Helper\stringHelper.cs" />
      <Compile Include="Assets\EgretUnity\poseplus\AniPlayer.cs" />
      <Compile Include="Assets\EgretUnity\poseplus\data\AniBoxColider.cs" />

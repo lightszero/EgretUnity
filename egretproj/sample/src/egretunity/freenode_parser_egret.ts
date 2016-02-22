@@ -579,7 +579,11 @@ namespace FreeNode.ForEgret3D
                         aplayer.boneobj[bonename] = this.mapNode[uuid]
                     }
                 }
-                aplayer.play(aplayer.getAnimList()[2]);
+                //自动播放第零个骨骼动画
+                if (aplayer.getAnimList().length > 0)
+                {
+                    aplayer.play(aplayer.getAnimList()[0]);
+                }
             }
             );
             //node.comps.push(anis);

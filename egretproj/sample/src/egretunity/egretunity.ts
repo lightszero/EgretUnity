@@ -1,6 +1,6 @@
 ﻿class egretUnity
 {
-    static ver: string = "v0.02";
+    static ver: string = "v0.03";
     public static InitDebuger(): void
     {
         var websock: WebSocket = new WebSocket("ws://localhost:8809/Debug");

@@ -5,13 +5,13 @@ var game_file_list = [
 	"libs/modules/egret/egret.js",
 	"libs/modules/egret/egret.native.js",
 	"libs/egret3d.js",
-	"bin-debug/egretunity/freenode.js",
-	"bin-debug/egretunity/freenode_parser_egret.js",
 	"bin-debug/egretunity/egretunity.js",
+	"bin-debug/egretunity/freenode.js",
 	"bin-debug/egretunity/freenode_egret_ani.js",
+	"bin-debug/egretunity/freenode_parser_egret.js",
 	"bin-debug/Main.js",
-	"bin-debug/Sample_CreateSky.js",
 	"bin-debug/SampleScene.js",
+	"bin-debug/Sample_CreateSky.js",
 	//----auto game_file_list end----
 ];
 
